@@ -35,8 +35,66 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
     
     CONDITION_QUERY_SET = [
+
+        # 'CLOSING PRICE IS GREATER THAN SETPOINT',
         f"""SELECT * FROM {constants.ALERTS_TABLE}
         WHERE {constants.TARGET_COL} < {price_row.Close[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'CLOSING PRICE IS LESS THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} > {price_row.Close[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'OPENING PRICE IS GREATER THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} < {price_row.Open[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'OPENING PRICE IS LESS THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} > {price_row.Open[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'HIGHEST PRICE IS GREATER THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} < {price_row.High[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'HIGHEST PRICE IS LESS THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} > {price_row.High[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'LOWEST PRICE IS GREATER THAN SETPOINT'
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} < {price_row.Low[-1]}
+        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+        AND {constants.EXPIRATION_COL} >= NOW()
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        """,
+
+        # 'LOWEST PRICE IS LESS THAN SETPOINT'
+         f"""SELECT * FROM {constants.ALERTS_TABLE}
+        WHERE {constants.TARGET_COL} > {price_row.Low[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
@@ -90,9 +148,7 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                                 print('Telegram message send fail: {} +=+ {}'.format(instrument, detail[detail[2]]))
                     else:
                         print('Wahala o the alert medium is not email and not telegram')
-                    
-                    print('data type of new_count', type(data[6]))
-                    
+                                        
                     update_alert_count(connection, alert_id=data[0], new_count=data[6] + 1)
 
         except Exception as e:
