@@ -71,19 +71,29 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                     body = constants.MESSAGE_BODY.format(
                         cdt=data[2], tgt=data[3], crtd=data[8],
                         rpt=data[5], exp=data[11], am=detail[0],
+                        note=data[12]
                         )
                     
                     if detail[0] == constants.EMAIL:
                         # send email
-                        send_email(email_receiver=detail[1], subject=subject, body=body,)
+                        status = send_email(email_receiver=detail[1], subject=subject, body=body,)
+                        if status is False:
+                            status = send_email(email_receiver=detail[1], subject=subject, body=body,)
+                            if status is False:
+                                print('email message send fail: {} +=+ {}'.format(instrument, detail[1]))
                     elif detail[0] == constants.TELEGRAM:
-                       
                         # send telegram
-                        send_telegram_message(message=f'{subject}\n\n{body}', chat_id=detail[2])
+                        status = send_telegram_message(message=f'{subject}\n\n{body}', chat_id=detail[2])
+                        if status is False:
+                            status = send_telegram_message(message=f'{subject}\n\n{body}', chat_id=detail[2])
+                            if status is False:
+                                print('Telegram message send fail: {} +=+ {}'.format(instrument, detail[detail[2]]))
                     else:
                         print('Wahala o the alert medium is not email and not telegram')
                     
-                    # update_alertcount_col(alert_id=data[0])
+                    print('data type of new_count', type(data[6]))
+                    
+                    update_alert_count(connection, alert_id=data[0], new_count=data[6] + 1)
 
         except Exception as e:
             print(f'Query_failed for {instrument}: {e}')
@@ -118,11 +128,14 @@ def send_email(email_receiver:str, subject:str, body:str):
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL('smtp.gmail.com', email_port, context=context) as smtp:
         smtp.login(email_sender, email_password)
-        smtp.sendmail(email_sender, email_receiver, em.as_string())
+        fback = smtp.sendmail(email_sender, email_receiver, em.as_string())
+        if not any(fback):
+            return False
+        else:
+            return True
 
 
-
-def send_telegram_message(message:str, chat_id):
+def send_telegram_message(message:str, chat_id) ->bool:
     """
     send telegram message to target device. all details provided
     """
@@ -133,3 +146,20 @@ def send_telegram_message(message:str, chat_id):
 
     response = requests.post(url, data).json()
     print(response)
+    if response['ok'] == True:
+        return True
+    else:
+        return False
+
+
+def update_alert_count(connection, alert_id:int, new_count:int):
+    """increment alertcount column of alerts table to enable us count alert repeat"""
+
+    update_query = f"""UPDATE {constants.ALERTS_TABLE} SET {constants.ALERT_COUNT} = {new_count}
+    WHERE {constants.ID} = {alert_id}"""
+
+    with connection.cursor() as cursor:
+        cursor.execute(update_query)
+        response = connection.commit()
+        # print(response)
+        return {response}

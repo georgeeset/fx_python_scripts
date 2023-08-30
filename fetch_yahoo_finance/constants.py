@@ -82,9 +82,10 @@ Your alert condition has been satisfied before your alert expiration time,
 kindly check your trading chart
 and confirm your plan before trading. below are details of the alert
 
-condigion: {cdt}
+Condition: {cdt}
 Target price: {tgt}
 Expiration: {crtd}
+Reminder Note: {note}
 
 Note: The alert will be repeated for {rpt} times if condition is still valid
 Alert will be automatically terminated on {exp}
