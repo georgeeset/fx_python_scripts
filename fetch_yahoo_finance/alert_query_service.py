@@ -10,6 +10,7 @@ from datetime import datetime
 from email.message import EmailMessage
 import ssl
 import smtplib
+import requests
 
 
 def alert_query_manager(price_row:pd.DataFrame, instrument:str):
@@ -37,7 +38,7 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         f"""SELECT * FROM {constants.ALERTS_TABLE}
         WHERE {constants.TARGET_COL} < {price_row.Close[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-        AND {constants.EXPIRATION_COL} <= NOW()
+        AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
         """,
     ]
@@ -49,20 +50,36 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                 cursor.execute(query)
                 response = cursor.fetchall()
                 print(response)
+                # response sample:
+                # ((9, 'EURUSD', 'CLOSING PRICE IS GREATER THAN SETPOINT', 0.015, 'H1', 5, 0, '0', datetime.datetime(2023, 8, 29, 16, 32, 54, 706657), 'Hours', 4, datetime.datetime(2023, 8, 29, 20, 32, 54, 706433), 'first sample of data query', 1, 1),)
                 print(type(response))
                 for data in response:
                     print(data[4]) # candle time determines when to send message
 
                     #data is tuple of tuple, we have to address with index
                     detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    print(detail)
+                    detail = list(detail)[0]
+                    # print(detail)
+                    # detail_sample: 
+                    # ('email', 'georgfet4u@gmail.com', None)
+                    # ('telegram', '@geogee', 124434455)
+                    # check if alert medium is email
 
-                     # check if alert medium is email
+                    subject = constants.MESSAGE_TITLE.format(pair=data[1], tf=data[4])
+
+                    body = constants.MESSAGE_BODY.format(
+                        cdt=data[2], tgt=data[3], crtd=data[8],
+                        rpt=data[5], exp=data[11], am=detail[0],
+                        )
+                    
                     if detail[0] == constants.EMAIL:
                         # send email
-                        send_email()
+                        send_email(email_receiver=detail[1], subject=subject, body=body,)
                     elif detail[0] == constants.TELEGRAM:
+                       
                         # send telegram
-                        send_telegram()
+                        send_telegram_message(message=f'{subject}\n\n{body}', chat_id=detail[2])
                     else:
                         print('Wahala o the alert medium is not email and not telegram')
                     
@@ -81,11 +98,11 @@ def get_alert_details(connection, alert_id:int, user_id:str):
     with connection.cursor() as cursor:
         cursor.execute(alert_medium_query)
         response = cursor.fetchone()
-        print(response)
+        # print(response)
         return {response}
         
 
-def send_email(email_receiver: str, subject: str, body: str):
+def send_email(email_receiver:str, subject:str, body:str):
     """cratre instance and send email"""
 
     email_sender = os.environ.get('FX_EMAIL')
@@ -102,3 +119,17 @@ def send_email(email_receiver: str, subject: str, body: str):
     with smtplib.SMTP_SSL('smtp.gmail.com', email_port, context=context) as smtp:
         smtp.login(email_sender, email_password)
         smtp.sendmail(email_sender, email_receiver, em.as_string())
+
+
+
+def send_telegram_message(message:str, chat_id):
+    """
+    send telegram message to target device. all details provided
+    """
+    telegram_token = os.environ.get('TELEGRAM_API_KEY')
+    url = f'https://api.telegram.org/bot{telegram_token}/sendMessage'
+
+    data = {'chat_id': chat_id, 'text': message}
+
+    response = requests.post(url, data).json()
+    print(response)
