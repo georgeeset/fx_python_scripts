@@ -23,19 +23,22 @@ from alert_query_service import alert_query_manager
 yf.set_tz_cache_location("yfinance_timezone.catch")
 
 
-class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
-    pass
+# class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
+#     pass
 
 def get_yf_data():
-    session = requests_cache.CachedSession('yfinance.cache')
-    session.headers['User-agent'] = 'user-program/1.0'
+    # # No caching for now all data needed to run
+    # session = requests_cache.CachedSession('yfinance.cache')
+    # session.headers['User-agent'] = 'user-program/1.0'
 
-    session = CachedLimiterSession(
-    limiter=Limiter(RequestRate(2, Duration.SECOND*5)),  # max 2 requests per 5 seconds
-    bucket_class=MemoryQueueBucket,
+
+    # # Dont need sessions since the script will be run once every hour
+    # session = CachedLimiterSession(
+    # limiter=Limiter(RequestRate(2, Duration.SECOND*5)),  # max 2 requests per 5 seconds
+    # bucket_class=MemoryQueueBucket,
     # backend=SQLiteCache("yfinance.cache"),
     # expire_after=datetime.now() - timedelta(minutes=60)
-    )
+    # )
 
     data = pd.DataFrame()
     try:
