@@ -4,11 +4,11 @@ from datetime import datetime
 import constants
 import pandas as pd
 from deriv_storage_service import store_in_db
-import os
+# import os
 
 async def connect_attempt():
     # Define your API key
-    api_key = os.environ.get('DERIV_API_KEY')
+    # api_key = os.environ.get('DERIV_API_KEY')
     api_id = '1089'
 
 

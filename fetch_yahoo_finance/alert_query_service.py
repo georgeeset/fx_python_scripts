@@ -5,7 +5,6 @@ import pandas as pd
 import pymysql
 import constants
 import os
-from datetime import datetime
 
 from email.message import EmailMessage
 import ssl

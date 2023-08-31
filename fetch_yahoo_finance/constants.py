@@ -3,16 +3,16 @@
 tickers =   [  
     'EURUSD=X',
     'EURJPY=X',
-    # 'USDJPY=X',
-    # 'GBPUSD=X',
-    # 'AUDUSD=X',
-    # 'USDCAD=X',
-    # 'USDCHF=X',
+    'USDJPY=X',
+    'GBPUSD=X',
+    'AUDUSD=X',
+    'USDCAD=X',
+    'USDCHF=X',
 
-    # 'CADCHF=X',
-    # 'USDCNY=X',
-    # 'USDHKD=X',
-    # 'EURGBP=X',
+    'CADCHF=X',
+    'USDCNY=X',
+    'USDHKD=X',
+    'EURGBP=X',
     ]
 
 deriv_tickers = {
