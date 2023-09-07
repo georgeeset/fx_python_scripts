@@ -64,7 +64,7 @@ REPEAT_ALARM_COL = 'repeat_alarm'
 ALERT_COUNT = 'alertcount'
 ALERT_MEDIUM_ID_COL = 'alert_medium_id'
 NOTE_COL = 'note'
-CONDITION_COL = 'condition'
+SETUP_CONDITION_COL = 'setup_condition'
 ALERT_MEDIUM_TABLE = 'fxmktwatch_alertmedium'
 ID = 'id'
 CHAT_ID = 'chat_id'
@@ -82,7 +82,7 @@ Your alert condition has been satisfied before your alert expiration time,
 kindly check your trading chart
 and confirm your plan before trading. below are details of the alert
 
-Condition: {cdt}
+Alert Condition: {cdt}
 Target price: {tgt}
 Expiration: {crtd}
 Reminder Note: {note}

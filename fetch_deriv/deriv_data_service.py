@@ -70,12 +70,12 @@ async def connect_attempt():
 
                 store_in_db(data=candles_data,
                             pair=f'{value[constants.TABLE]}_h1',
-                                store_rows=-1,
+                            store_rows=-1,
                             )
                 
                 #first rename the df column to help enable simless dataformat
                 candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
-                alert_query_manager(candles_data, instrument=f'{value[constants.TABLE]}_h1')
+                alert_query_manager(candles_data, instrument=value[constants.TABLE])
                 # break
             ## Print the candle data
             # for candle in candles.get('candles'):

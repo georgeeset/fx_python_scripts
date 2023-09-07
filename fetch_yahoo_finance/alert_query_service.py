@@ -47,7 +47,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} < {price_row.Close[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
         """,
 
         # 'CLOSING PRICE IS LESS THAN SETPOINT'
@@ -55,7 +56,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} > {price_row.Close[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
         """,
 
         # 'OPENING PRICE IS GREATER THAN SETPOINT'
@@ -63,7 +65,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} < {price_row.Open[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS GREATER THAN SETPOINT';
         """,
 
         # 'OPENING PRICE IS LESS THAN SETPOINT'
@@ -71,7 +74,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} > {price_row.Open[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS LESS THAN SETPOINT';
         """,
 
         # 'HIGHEST PRICE IS GREATER THAN SETPOINT'
@@ -79,7 +83,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} < {price_row.High[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS GREATER THAN SETPOINT';
         """,
 
         # 'HIGHEST PRICE IS LESS THAN SETPOINT'
@@ -87,7 +92,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} > {price_row.High[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS LESS THAN SETPOINT';
         """,
 
         # 'LOWEST PRICE IS GREATER THAN SETPOINT'
@@ -95,16 +101,18 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         WHERE {constants.TARGET_COL} < {price_row.Low[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS GREATER THAN SETPOINT';
         """,
 
         # 'LOWEST PRICE IS LESS THAN SETPOINT'
-         f"""SELECT * FROM {constants.ALERTS_TABLE}
+        f"""SELECT * FROM {constants.ALERTS_TABLE}
         WHERE {constants.TARGET_COL} > {price_row.Low[-1]}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT};
-        """,
+        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS LESS THAN SETPOINT';
+        """
     ]
 
     if pd.isna(price_row.Open[-1]) or pd.isna(price_row.Close[-1]):
@@ -122,7 +130,6 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                 print(type(response))
                 for data in response:
                     print(data[4]) # candle time determines when to send message
-
                     #data is tuple of tuple, we have to address with index
                     detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
                     print(detail)
