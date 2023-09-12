@@ -74,6 +74,11 @@ USER_ID_COL = 'user_id'
 EMAIL = 'email'
 TELEGRAM = 'telegram'
 
+H1 = 'H1'
+H4 = 'H4'
+D1 = 'D1'
+M1 = 'M1'
+
 MESSAGE_TITLE = """PRICE ALERT {pair} on {tf}"""
 MESSAGE_BODY = """
 Hi,

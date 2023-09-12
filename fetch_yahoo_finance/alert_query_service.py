@@ -11,6 +11,7 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 import requests
+from datetime import datetime
 
 
 def alert_query_manager(price_row:pd.DataFrame, instrument:str):
@@ -131,8 +132,25 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                 for data in response:
                     print(data[4]) # candle time determines when to send message
                     #data is tuple of tuple, we have to address with index
-                    detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+
+                    current_time = datetime.utcnow()
+                    tf = data[4]
+                    detail = None
+
+                    if current_time.hour % 4 == 0: # 4 hour timeframe alert included
+                        if tf == constants.H1 or tf == constants.H4:
+                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif current_time.hour == 0: # for D1 timeframe
+                        if tf == constants.H1 or tf == constants.H4 or tf == constants.D1:
+                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif current_time.day == 1: # for M1 timeframe
+                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+
+                    if not detail:
+                        continue
+
                     print(detail)
+
                     detail = list(detail)[0]
                     # print(detail)
                     # detail_sample: 
@@ -217,7 +235,7 @@ def send_telegram_message(message:str, chat_id) ->bool:
     data = {'chat_id': chat_id, 'text': message}
 
     response = requests.post(url, data).json()
-    print(response)
+    # print(response)
     if response['ok'] == True:
         return True
     else:
