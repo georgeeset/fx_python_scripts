@@ -88,3 +88,5 @@ async def connect_attempt():
 
 
 asyncio.run(connect_attempt())
+
+exit()
