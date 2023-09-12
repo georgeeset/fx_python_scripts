@@ -11,6 +11,7 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 import requests
+from datetime import datetime
 
 
 def alert_query_manager(price_row:pd.DataFrame, instrument:str):
@@ -129,10 +130,30 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                 # ((9, 'EURUSD', 'CLOSING PRICE IS GREATER THAN SETPOINT', 0.015, 'H1', 5, 0, '0', datetime.datetime(2023, 8, 29, 16, 32, 54, 706657), 'Hours', 4, datetime.datetime(2023, 8, 29, 20, 32, 54, 706433), 'first sample of data query', 1, 1),)
                 print(type(response))
                 for data in response:
+                    
                     print(data[4]) # candle time determines when to send message
                     #data is tuple of tuple, we have to address with index
-                    detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+
+                    current_time = datetime.utcnow()
+                    tf = data[4]
+                    detail = None
+
+                    if current_time.day == 1 and current_time.hour == 0: # for M1 timeframe
+                        detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif current_time.hour == 0: # for D1 timeframe
+                        if tf == constants.H1 or tf == constants.H4 or tf == constants.D1:
+                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif current_time.hour % 4 == 0: # 4 hour timeframe alert included
+                        if tf == constants.H1 or tf == constants.H4:
+                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif tf == constants.H1:
+                        detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+
+                    if not detail:
+                        continue
+
                     print(detail)
+                
                     detail = list(detail)[0]
                     # print(detail)
                     # detail_sample: 

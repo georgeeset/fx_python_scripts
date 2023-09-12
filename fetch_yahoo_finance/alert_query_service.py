@@ -137,14 +137,16 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                     tf = data[4]
                     detail = None
 
-                    if current_time.hour % 4 == 0: # 4 hour timeframe alert included
-                        if tf == constants.H1 or tf == constants.H4:
-                            detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    if current_time.day == 1 and current_time.hour == 0: # for M1 timeframe
+                        detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
                     elif current_time.hour == 0: # for D1 timeframe
                         if tf == constants.H1 or tf == constants.H4 or tf == constants.D1:
                             detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
-                    elif current_time.day == 1: # for M1 timeframe
+                    elif current_time.hour % 4 == 0: # 4 hour timeframe alert included
+                        if tf == constants.H1 or tf == constants.H4:
                             detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                    elif tf == constants.H1:
+                        detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
 
                     if not detail:
                         continue
