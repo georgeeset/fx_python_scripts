@@ -68,7 +68,7 @@ def get_yf_data():
         # print(constants.tickers[i])
         # print(type(data_list[i].iloc[-1]))
         print('====================={}================'.format(key))
-        print(value)
+        # print(value)
         store_in_db(value, pair=f'{key[:-2]}_h1', store_rows=-2)
         alert_query_manager(value, instrument=key[:-2]) # remove the _h1
 

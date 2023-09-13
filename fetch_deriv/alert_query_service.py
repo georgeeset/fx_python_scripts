@@ -120,7 +120,7 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         print('data contains nan no need to query')
         return
     for query in CONDITION_QUERY_SET:
-        print(query)
+        # print(query)
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
@@ -166,7 +166,8 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                     body = constants.MESSAGE_BODY.format(
                         cdt=data[2], tgt=data[3], crtd=data[8],
                         rpt=data[5], exp=data[11], am=detail[0],
-                        note=data[12]
+                        note=data[12], pair=data[1], tmf=data[4],
+                        cnt=data[6]
                         )
                     
                     if detail[0] == constants.EMAIL:

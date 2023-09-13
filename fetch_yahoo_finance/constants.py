@@ -84,24 +84,27 @@ MESSAGE_BODY = """
 Hi,
 
 Your alert condition has been satisfied before your alert expiration time,
-kindly check your trading chart
-and confirm your plan before trading. below are details of the alert
+kindly check your trading chart to confirm your trading plan.
 
+Instrument: {pair}
+Timeframe: {tmf}
 Alert Condition: {cdt}
 Target price: {tgt}
 Expiration: {crtd}
+
+Alert sending status: {cnt} / {rpt}
+Alert Expirex on: {exp}
+Prefered Alert Medium: {am}
+
 Reminder Note: {note}
 
-Note: The alert will be repeated for {rpt} times if condition is still valid
-Alert will be automatically terminated on {exp}
 
 TRADE WISELY !!!
 
-Disclaimer
-fx-price-watch is not a financial advicer and will not be held accountable for
-your trading decitions
-
-You are receiving this message because you subscribed to {am} alert on
-fx-price watch website. to unsubscribe to this message,
-delete the alert on your profile
 """
+# Disclaimer
+# fx-price-watch is not a financial advicer and will not be held accountable for
+# your trading decitions
+# You are receiving this message because you subscribed to {am} alert on
+# fx-price watch website. to unsubscribe to this message,
+# delete the alert on your profile
