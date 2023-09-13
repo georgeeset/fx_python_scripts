@@ -66,7 +66,7 @@ async def connect_attempt():
 
                 candles_data = pd.DataFrame.from_dict(dict_data)
                 candles_data.set_index(constants.DATETIME, inplace=True)
-                print(candles_data)
+                # print(candles_data)
 
                 store_in_db(data=candles_data,
                             pair=f'{value[constants.TABLE]}_h1',
