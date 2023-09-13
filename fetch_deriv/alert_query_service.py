@@ -128,7 +128,7 @@ def alert_query_manager(price_row:pd.DataFrame, instrument:str):
                 print(response)
                 # response sample:
                 # ((9, 'EURUSD', 'CLOSING PRICE IS GREATER THAN SETPOINT', 0.015, 'H1', 5, 0, '0', datetime.datetime(2023, 8, 29, 16, 32, 54, 706657), 'Hours', 4, datetime.datetime(2023, 8, 29, 20, 32, 54, 706433), 'first sample of data query', 1, 1),)
-                print(type(response))
+                # print(type(response))
                 for data in response:
                     
                     print(data[4]) # candle time determines when to send message
