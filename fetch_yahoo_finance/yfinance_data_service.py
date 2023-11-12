@@ -1,17 +1,11 @@
 '''
 connect and extract price data form yf
 '''
-import requests_cache
 import yfinance as yf
 import pandas as pd
 # import requests_cache
-from requests import Session
-from requests_cache import CacheMixin, SQLiteCache
-from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
-from pyrate_limiter import Duration, RequestRate, Limiter
 # import pymysql
 import constants
-from datetime import datetime, timedelta
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
 
@@ -27,18 +21,6 @@ yf.set_tz_cache_location("yfinance_timezone.catch")
 #     pass
 
 def get_yf_data():
-    # # No caching for now all data needed to run
-    # session = requests_cache.CachedSession('yfinance.cache')
-    # session.headers['User-agent'] = 'user-program/1.0'
-
-
-    # # Dont need sessions since the script will be run once every hour
-    # session = CachedLimiterSession(
-    # limiter=Limiter(RequestRate(2, Duration.SECOND*5)),  # max 2 requests per 5 seconds
-    # bucket_class=MemoryQueueBucket,
-    # backend=SQLiteCache("yfinance.cache"),
-    # expire_after=datetime.now() - timedelta(minutes=60)
-    # )
 
     data = pd.DataFrame()
     try:

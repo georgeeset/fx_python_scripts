@@ -67,13 +67,19 @@ Your alert condition has been satisfied before your alert expiration time,
 kindly check your trading chart to confirm your trading plan.
 
 Instrument: {pair}
+
 Timeframe: {tmf}
+
 Alert Condition: {cdt}
+
 Target price: {tgt}
+
 Expiration: {crtd}
 
 Alert sending status: {cnt} / {rpt}
+
 Alert Expirex on: {exp}
+
 Prefered Alert Medium: {am}
 
 Reminder Note: {note}
@@ -81,4 +87,17 @@ Reminder Note: {note}
 
 TRADE WISELY !!!
 
+"""
+
+HTML_MESSAGE = """
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Market Watch</title>
+</head>
+<body>
+    {}
+</body>
+</html>
 """
