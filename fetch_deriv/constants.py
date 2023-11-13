@@ -23,11 +23,11 @@ DERIV_TICKERS = [
     {'id': 'JD100', 'table':'Jump_100_Index'},
 ]
 
-OPEN = 'open'
-HIGH = 'high'
-LOW = 'low'
-CLOSE = 'close'
-DATETIME ='datetime'
+OPEN = 'Open'
+HIGH = 'High'
+LOW = 'Low'
+CLOSE = 'Close'
+DATETIME ='Datetime'
 CANDLES = 'candles'
 EPOCH = 'epoch'
 
@@ -57,6 +57,7 @@ TELEGRAM = 'telegram'
 H1 = 'H1'
 H4 = 'H4'
 D1 = 'D1'
+W1 = 'W1'
 M1 = 'M1'
 
 MESSAGE_TITLE = """PRICE ALERT {pair} on {tf}"""

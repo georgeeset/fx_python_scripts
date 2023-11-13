@@ -4,6 +4,7 @@ import pandas as pd
 import pymysql
 import constants
 import os
+import logging
 
 def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:bool = False) -> bool:
     """
@@ -41,23 +42,6 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
 
     # print(constants.CLOSE.capitalize())
 
-    query = f"""CREATE TABLE IF NOT EXISTS {pair} (
-            {constants.DATETIME} DATETIME PRIMARY KEY,
-            {constants.OPEN.capitalize()} FLOAT,
-            {constants.HIGH.capitalize()} FLOAT,
-            {constants.LOW.capitalize()} FLOAT,
-            {constants.CLOSE.capitalize()} FLOAT,
-            {constants.VOLUME.capitalize()} FLOAT
-            );"""
-
-    try:
-        with connection.cursor() as cursor:
-                cursor.execute(query),
-    except Exception as e:
-        print('creating TABLE error has occured: ==', e)
-        return False
-
-
     # clear table if it is marked for deletion
     if clear_tables == True:
         queryX = f"""DROP TABLE {pair} """
@@ -66,21 +50,35 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
             with connection.cursor() as cursor:
                     cursor.execute(queryX),
         except Exception as e:
-         print('DELETING TABLE ERROR occured: ==', e)
-        
-        print('table deleted')
-       
+         logging.error(f'DELETING TABLE ERROR occured: ==> {e}')
 
+        logging.info('table deleted')
+
+    query = f"""CREATE TABLE IF NOT EXISTS {pair} (
+            {constants.DATETIME} DATETIME PRIMARY KEY,
+            {constants.OPEN} FLOAT,
+            {constants.HIGH} FLOAT,
+            {constants.LOW} FLOAT,
+            {constants.CLOSE} FLOAT,
+            {constants.VOLUME} FLOAT
+            );"""
+
+    try:
+        with connection.cursor() as cursor:
+                cursor.execute(query),
+    except Exception as e:
+        logging.error('creating TABLE error has occured: ==', e)
+        return False
 
     for item in trimed_data.index:
         # print(item)
-        # print(trimed_data[constants.open][item])
+        # print(trimed_data[constants.OPEN][item])
         # print(trimed_data.index[0])
         try:
             db_query = f"""REPLACE INTO {pair} (
-                {constants.DATETIME},{constants.OPEN.capitalize()},
-                {constants.HIGH.capitalize()},{constants.LOW.capitalize()},
-                {constants.CLOSE.capitalize()})
+                {constants.DATETIME},{constants.OPEN},
+                {constants.HIGH},{constants.LOW},
+                {constants.CLOSE})
                 VALUES ('{item}', {trimed_data[constants.OPEN][item]},
                 {trimed_data[constants.HIGH][item]}, 
                 {trimed_data[constants.LOW][item]}, 
@@ -90,6 +88,6 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
                 cursor.execute(db_query)
                 connection.commit()
         except Exception as e:
-             print(f'error loading file => {pair}', e)
+             logging.error(f'error loading file => {pair}', e)
 
     connection.close()

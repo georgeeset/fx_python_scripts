@@ -6,14 +6,12 @@ import pandas as pd
 import pymysql
 import constants
 import os
-
-from email.message import EmailMessage
-import ssl
+import logging
 import aiosmtplib
 import requests
 from datetime import datetime
 import asyncio
-import logging
+
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -45,7 +43,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         raise ValueError('Value must be a dataframe with OHLC daeta')
     
     print('query task started. instrument ->', instrument)
-    print('open', price_row.Close[-1])
+    # print('open', price_row.Close[-1])
 
     # Connect to the database
     connection = pymysql.connect(
@@ -132,62 +130,73 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         """
     ]
 
-    # if pd.isna(price_row.Open[-1]) or pd.isna(price_row.Close[-1]):
     if price_row.iloc[-1].isna().values.any():
-        print('data contains nan no need to query')
+        logging.info('data contains nan no need to query')
         return
     # print(price_row.iloc[-1].isna().values.any())
     for query in CONDITION_QUERY_SET:
         # print(query)
-        await query_db(connection, query, instrument)
+        await query_db(connection, query)
     
-    print(f"======== Query db end for {instrument} ===========")
+    logging.info(f"======== Query completed for {instrument} ===========")
 
-def time_frame_filter(data: tuple, connection) -> callable:
-    current_time = datetime.utcnow()
-    tf = data[4]
+def time_frame_filter(time_frame) -> bool:
+    """ Determine if the timeframe is eligable to receive alert
+    args:
+        timeframe: string symbol of the timeframe h1, W1,
+    """
+    current_time = datetime.now()
+    good_to_send = False
 
-    if current_time.day == 1 and current_time.hour == 0: # for M1 timeframe
-        return get_alert_details(connection, alert_id=data[13], user_id=data[14])
-    elif current_time.hour == 0: # for D1 timeframe
-        if tf == constants.H1 or tf == constants.H4 or tf == constants.D1:
-            return get_alert_details(connection, alert_id=data[13], user_id=data[14])
-    elif current_time.hour % 4 == 0: # 4 hour timeframe alert included
-        if tf == constants.H1 or tf == constants.H4:
-            return get_alert_details(connection, alert_id=data[13], user_id=data[14])
-    elif tf == constants.H1:
-        return get_alert_details(connection, alert_id=data[13], user_id=data[14])
+    if time_frame == constants.H1:
+            good_to_send = True
+    elif time_frame == constants.H4:
+        if current_time.hour % 4 == 0:
+            good_to_send = True
+    elif time_frame == constants.D1:
+        if current_time.hour == 0:
+            good_to_send = True
+    elif time_frame == constants.W1:
+        if current_time.weekday == 0:
+            good_to_send = True
+    elif time_frame == constants.M1:
+        if current_time.day == 1:
+            good_to_send = True
+    
+    return good_to_send
 
-    return None  
 
-
-async def query_db(connection, query, instrument):
-    print('query don start')
+async def query_db(connection, query) -> None:
+    """Query database with given query command
+    based on query ersult.
+    args:
+        connection: pymysql connection for database
+        query: Mysql query string to apply to database
+    """
+    # print('query don start')
     async_tasks = []
     # try:
     with connection.cursor() as cursor:
         cursor.execute(query)
         response = cursor.fetchall()
-        print("response from query {}".format(response))
+        # print("response from query {}".format(response))
         # response sample:
         # ((9, 'EURUSD', 'CLOSING PRICE IS GREATER THAN SETPOINT', 0.015, 'H1', 5, 0, '0', datetime.datetime(2023, 8, 29, 16, 32, 54, 706657), 'Hours', 4, datetime.datetime(2023, 8, 29, 20, 32, 54, 706433), 'first sample of data query', 1, 1),)
         # print(type(response))
         if not any(response):
-            print("response is empty")
+            # print("response is empty")
             return
         for data in response:
-            
-            print(data[4]) # candle time determines when to send message
+            # print(data[4])
+            # candle time determines when to send message
             #data is tuple of tuple, we have to address with index
 
-            detail =  time_frame_filter(data, connection)
-            if detail is None:
-                continue
+            if time_frame_filter(data[4]):
+                detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
 
             # print(detail)
 
             detail = list(detail)[0]
-            # print(detail)
             # detail_sample: 
             # ('email', 'geossfgfetsjkj@company.com', None)
             # ('telegram', '@gasdwee', 1244334345)
@@ -202,9 +211,6 @@ async def query_db(connection, query, instrument):
                 cnt=data[6]
                 )
             
-            # loop = asyncio.get_event_loop()
-            # result= await loop.run_in_executor(None, send_email, task)
-            
             if detail[0] == constants.EMAIL:
                 email_task = asyncio.create_task(send_email_async(email_receiver=detail[1], subject=subject, body=body))
                 async_tasks.append(email_task)
@@ -212,19 +218,15 @@ async def query_db(connection, query, instrument):
                 telegram_task = asyncio.create_task(send_telegram_async(message=f'{subject}\n\n{body}', chat_id=detail[2]))
                 async_tasks.append(telegram_task)
             else:
-                print('Wahala o the alert medium is not email and not telegram')
+                logging.error(f'Wahala o the alert medium is not email or telegram {detail[0]}')
                                 
             update_alert_count(connection, alert_id=data[0], new_count=data[6] + 1)
         results = await asyncio.gather(*async_tasks)
         # check if you like the response
         if all(results):
-            print("all messsages sent {}".format(results))
+            logging.info("all messsages sent {}".format(results))
         else:
-            print("some messages failed {}".format(results) )
-
-    # except Exception as e:
-    #         print(f'Query_failed for {instrument}: {e.__traceback__} {e}')
-    
+            logging.warning("some messages failed {}".format(results) )
 
 
 def get_alert_details(connection, alert_id:int, user_id:str):
@@ -238,7 +240,7 @@ def get_alert_details(connection, alert_id:int, user_id:str):
         response = cursor.fetchone()
         # print(response)
         return {response}
-        
+
 
 # async def send_email(email_receiver:str, subject:str, body:str):
 #     """cratre instance and send email"""
@@ -301,7 +303,6 @@ async def send_email_async(email_receiver: str, subject: str, body:str, **params
         password=email_password,
         use_tls=True
         )
-    
 
 
 # def send_telegram_message(message:str, chat_id) ->bool:
