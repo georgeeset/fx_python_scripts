@@ -1,5 +1,10 @@
 """ consstants file for cleaner code"""
 
+
+
+""" id and table name map for easy represnetation of
+database table name and api reference id for each currency pair
+"""
 DERIV_TICKERS = [
     # {'id':'frxAUDUSD', 'table': 'AUDUSD'},
     # {'id':'frxEURGBP', 'table': 'EURGBP'},
@@ -22,6 +27,26 @@ DERIV_TICKERS = [
     {'id': 'JD75', 'table': 'Jump_75_Index'},
     {'id': 'JD100', 'table':'Jump_100_Index'},
 ]
+
+
+""" forex ticker list for yf query
+"""
+YF_TICKERS =   [  
+    'EURUSD=X',
+    'EURJPY=X',
+    'USDJPY=X',
+    'GBPUSD=X',
+    'AUDUSD=X',
+    'USDCAD=X',
+    'USDCHF=X',
+
+    'CADCHF=X',
+    'USDCNY=X',
+    'USDHKD=X',
+    'EURGBP=X',
+    ]
+
+
 
 OPEN = 'Open'
 HIGH = 'High'
@@ -54,6 +79,7 @@ ALERT_TYPE = 'alert_type'
 USER_ID_COL = 'user_id'
 EMAIL = 'email'
 TELEGRAM = 'telegram'
+
 H1 = 'H1'
 H4 = 'H4'
 D1 = 'D1'

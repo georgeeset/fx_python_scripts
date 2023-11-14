@@ -190,13 +190,14 @@ async def query_db(connection, query) -> None:
             # print(data[4])
             # candle time determines when to send message
             #data is tuple of tuple, we have to address with index
+            alert_detail = None
 
             if time_frame_filter(data[4]):
-                detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+                alert_detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
 
-            # print(detail)
-
-            detail = list(detail)[0]
+            #convert to list first before accessing by index
+            detail = list(alert_detail)[0]
+    
             # detail_sample: 
             # ('email', 'geossfgfetsjkj@company.com', None)
             # ('telegram', '@gasdwee', 1244334345)
@@ -231,7 +232,9 @@ async def query_db(connection, query) -> None:
 
 def get_alert_details(connection, alert_id:int, user_id:str):
     """ query user's alert_detail with the given alert_id"""
-    alert_medium_query =  f"""SELECT {constants.ALERT_TYPE}, {constants.ALERT_ID}, {constants.CHAT_ID} FROM {constants.ALERT_MEDIUM_TABLE}
+    alert_medium_query =  f"""
+        SELECT {constants.ALERT_TYPE}, {constants.ALERT_ID}, {constants.CHAT_ID}
+        FROM {constants.ALERT_MEDIUM_TABLE}
         WHERE {constants.ID} = {alert_id}
         AND {constants.USER_ID_COL} = '{user_id}';
         """

@@ -16,6 +16,7 @@ from alert_query_service import alert_query_manager
 async def get_yf_data():
 
     data = pd.DataFrame()
+    query_async_tasks = []
     # try:
     #     data = yf.download(tickers=constants.tickers, period='1d', interval='60m') # , session=session)
     # except Exception as e:
@@ -25,7 +26,7 @@ async def get_yf_data():
     # print(data['Open'][constants.tickers[0]])
     # print(len(data))
 
-    for item in constants.tickers:
+    for item in constants.YF_TICKERS:
 
         data = await asyncio.to_thread(yf.download, tickers=item, period='1d', interval='60m' )
 
@@ -48,26 +49,19 @@ async def get_yf_data():
         store_in_db(data, pair=f'{item[:-2]}_h1')
 
         # remove the -X1 from item
-        asyncio.create_task(alert_query_manager(data, instrument=item[:-2]))
+        query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2]))
+        query_async_tasks.append(query_task)
 
         logging.info(f"+++++++done with ticker {item}=======")
 
-    # for key, value in data_dict.items():
-    #     # print(constants.tickers[i])
-    #     # print(type(data_list[i].iloc[-1]))
-    #     print('====================={}================'.format(key))
-    #     # print(value)
-    #     store_in_db(value, pair=f'{key[:-2]}_h1', store_rows=-2)
-    #     alert_query_manager(value, instrument=key[:-2]) # remove the _h1
-
-    # print(len(data_dict))
+    await asyncio.gather(*query_async_tasks)
 
 if __name__ == '__main__':
     # Get the script's absolute path
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     logging.basicConfig(
-    level = logging.WARNING,
+    level = logging.INFO,
     filemode = 'a',
     filename = os.path.join(script_dir, 'YF_log.log'),
     format='%(asctime)s %(levelname)s %(message)s',

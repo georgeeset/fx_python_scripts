@@ -9,7 +9,7 @@ import constants
 import logging
 import os
 import pandas as pd
-from deriv_storage_service import store_in_db
+from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
 
 
@@ -57,6 +57,8 @@ async def connect_attempt() -> None:
     #connect to derif api socket
     api = DerivAPI(app_id=api_id)
 
+    query_async_tasks = []
+
     # Make the API request to get candles data
     for value in constants.DERIV_TICKERS:
         
@@ -79,9 +81,12 @@ async def connect_attempt() -> None:
 
             #first rename the df column to help enable simless dataformat
             # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
-            asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE]))
+            query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE]))
+            query_async_tasks.append(query_task)
 
         logging.info(f"=========End Query for {value.get('table')}==================")
+
+    await asyncio.gather(*query_async_tasks)
 
 
 if __name__  == "__main__":
