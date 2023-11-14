@@ -94,9 +94,9 @@ if __name__  == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     logging.basicConfig(
-    level = logging.WARNING,
+    level = logging.INFO,
     filemode = 'a',
-    filename = os.path.join(script_dir, 'deriv_log.log'),
+    filename = os.path.join(script_dir, 'logs/deriv_log.log'),
     format='%(asctime)s %(levelname)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     force = True

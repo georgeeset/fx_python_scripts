@@ -1,12 +1,10 @@
-'''
-connect and extract price data form yf
-'''
+#!/usr/bin/env python3
+"""connect and extract price data form yf
+"""
 import logging
 import os
 import yfinance as yf
 import pandas as pd
-# import requests_cache
-# import pymysql
 import constants
 import asyncio
 from db_storage_service import store_in_db
@@ -63,7 +61,7 @@ if __name__ == '__main__':
     logging.basicConfig(
     level = logging.INFO,
     filemode = 'a',
-    filename = os.path.join(script_dir, 'YF_log.log'),
+    filename = os.path.join(script_dir, 'logs/YF_log.log'),
     format='%(asctime)s %(levelname)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     force = True
