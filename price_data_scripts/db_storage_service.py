@@ -15,6 +15,7 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
                     the value must be nagative. e.g -2 ->[-2:]
     return: bool of update status success = True failed = False
     """
+
     # Connect to the database
     connection = pymysql.connect(
         host=os.environ.get('STORAGE_MYSQL_HOST'),
@@ -78,11 +79,13 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
             db_query = f"""REPLACE INTO {pair} (
                 {constants.DATETIME},{constants.OPEN},
                 {constants.HIGH},{constants.LOW},
-                {constants.CLOSE})
+                {constants.CLOSE}, {constants.VOLUME})
                 VALUES ('{item}', {trimed_data[constants.OPEN][item]},
-                {trimed_data[constants.HIGH][item]}, 
+                {trimed_data[constants.HIGH][item]},
                 {trimed_data[constants.LOW][item]}, 
-                {trimed_data[constants.CLOSE][item]});
+                {trimed_data[constants.CLOSE][item]},
+                {trimed_data[constants.VOLUME][item]
+                 if constants.VOLUME in trimed_data.columns else 0});
                 """
             with connection.cursor() as cursor:
                 cursor.execute(db_query)

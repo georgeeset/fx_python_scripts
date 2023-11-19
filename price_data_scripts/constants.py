@@ -46,7 +46,28 @@ YF_TICKERS =   [
     'EURGBP=X',
     ]
 
+CRYPTO_TICKERS = [
+    'ETHUSDT',
+    'BTCUSDT',
+    'SOLUSDT',
+    'FTTUSDT',
+    'XRPUSDT',
+    'BNBUSDT',
+    'LINKUSDT',
+    'FTTUSDT',
+    'AVAXUSDT',
+    'TIAUSDT',
+    'AVAXUSDT',
+    ]
 
+KLINE_COLUMN_NAMES= ['open_time','Open',
+               'High', 'Low', 'Close',
+               'Volume','close_time',
+               'qav','num_trades','taker_base_vol',
+               'taker_quote_vol', 'ignore'
+               ]
+
+RESULT = 'result'
 
 OPEN = 'Open'
 HIGH = 'High'
@@ -56,7 +77,7 @@ DATETIME ='Datetime'
 CANDLES = 'candles'
 EPOCH = 'epoch'
 
-VOLUME = 'volume'
+VOLUME = 'Volume'
 TABLE = 'table'
 ID = 'id'
 
