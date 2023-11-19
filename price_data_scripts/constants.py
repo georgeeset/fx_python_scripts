@@ -1,5 +1,10 @@
 """ consstants file for cleaner code"""
 
+
+
+""" id and table name map for easy represnetation of
+database table name and api reference id for each currency pair
+"""
 DERIV_TICKERS = [
     # {'id':'frxAUDUSD', 'table': 'AUDUSD'},
     # {'id':'frxEURGBP', 'table': 'EURGBP'},
@@ -23,15 +28,56 @@ DERIV_TICKERS = [
     {'id': 'JD100', 'table':'Jump_100_Index'},
 ]
 
-OPEN = 'open'
-HIGH = 'high'
-LOW = 'low'
-CLOSE = 'close'
-DATETIME ='datetime'
+
+""" forex ticker list for yf query
+"""
+YF_TICKERS =   [  
+    'EURUSD=X',
+    'EURJPY=X',
+    'USDJPY=X',
+    'GBPUSD=X',
+    'AUDUSD=X',
+    'USDCAD=X',
+    'USDCHF=X',
+
+    'CADCHF=X',
+    'USDCNY=X',
+    'USDHKD=X',
+    'EURGBP=X',
+    ]
+
+CRYPTO_TICKERS = [
+    'ETHUSDT',
+    'BTCUSDT',
+    'SOLUSDT',
+    'FTTUSDT',
+    'XRPUSDT',
+    'BNBUSDT',
+    'LINKUSDT',
+    'FTTUSDT',
+    'AVAXUSDT',
+    'TIAUSDT',
+    'AVAXUSDT',
+    ]
+
+KLINE_COLUMN_NAMES= ['open_time','Open',
+               'High', 'Low', 'Close',
+               'Volume','close_time',
+               'qav','num_trades','taker_base_vol',
+               'taker_quote_vol', 'ignore'
+               ]
+
+RESULT = 'result'
+
+OPEN = 'Open'
+HIGH = 'High'
+LOW = 'Low'
+CLOSE = 'Close'
+DATETIME ='Datetime'
 CANDLES = 'candles'
 EPOCH = 'epoch'
 
-VOLUME = 'volume'
+VOLUME = 'Volume'
 TABLE = 'table'
 ID = 'id'
 
@@ -54,9 +100,11 @@ ALERT_TYPE = 'alert_type'
 USER_ID_COL = 'user_id'
 EMAIL = 'email'
 TELEGRAM = 'telegram'
+
 H1 = 'H1'
 H4 = 'H4'
 D1 = 'D1'
+W1 = 'W1'
 M1 = 'M1'
 
 MESSAGE_TITLE = """PRICE ALERT {pair} on {tf}"""
@@ -67,13 +115,19 @@ Your alert condition has been satisfied before your alert expiration time,
 kindly check your trading chart to confirm your trading plan.
 
 Instrument: {pair}
+
 Timeframe: {tmf}
+
 Alert Condition: {cdt}
+
 Target price: {tgt}
+
 Expiration: {crtd}
 
 Alert sending status: {cnt} / {rpt}
+
 Alert Expirex on: {exp}
+
 Prefered Alert Medium: {am}
 
 Reminder Note: {note}
@@ -81,4 +135,17 @@ Reminder Note: {note}
 
 TRADE WISELY !!!
 
+"""
+
+HTML_MESSAGE = """
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX Market Watch</title>
+</head>
+<body>
+    {}
+</body>
+</html>
 """
