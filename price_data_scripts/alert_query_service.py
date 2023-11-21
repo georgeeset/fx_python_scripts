@@ -130,7 +130,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         """
     ]
 
-    if price_row.iloc[-1].isna().values.any():
+    if price_row.empty:
         logging.info('data contains nan no need to query')
         return
     # print(price_row.iloc[-1].isna().values.any())
