@@ -70,3 +70,27 @@
 2023-11-19 04:28:56 INFO ======== Query completed for USDHKD ===========
 2023-11-19 04:28:57 INFO +++++++done with ticker EURGBP=X=======
 2023-11-19 04:28:57 INFO ======== Query completed for EURGBP ===========
+2023-11-21 18:54:12 INFO +++++++done with ticker EURUSD=X=======
+2023-11-21 18:54:13 INFO +++++++done with ticker EURJPY=X=======
+2023-11-21 18:54:13 INFO ======== Query completed for EURJPY ===========
+2023-11-21 18:54:16 INFO +++++++done with ticker USDJPY=X=======
+2023-11-21 18:54:17 INFO ======== Query completed for USDJPY ===========
+2023-11-21 18:54:17 INFO all messsages sent [True]
+2023-11-21 18:54:17 INFO ======== Query completed for EURUSD ===========
+2023-11-21 18:54:18 INFO +++++++done with ticker GBPUSD=X=======
+2023-11-21 18:54:18 INFO ======== Query completed for GBPUSD ===========
+2023-11-21 18:54:19 INFO +++++++done with ticker AUDUSD=X=======
+2023-11-21 18:54:20 INFO +++++++done with ticker USDCAD=X=======
+2023-11-21 18:54:20 INFO ======== Query completed for USDCAD ===========
+2023-11-21 18:54:23 INFO +++++++done with ticker USDCHF=X=======
+2023-11-21 18:54:23 INFO ======== Query completed for USDCHF ===========
+2023-11-21 18:54:24 INFO +++++++done with ticker CADCHF=X=======
+2023-11-21 18:54:24 INFO ======== Query completed for CADCHF ===========
+2023-11-21 18:54:24 INFO +++++++done with ticker USDCNY=X=======
+2023-11-21 18:54:24 INFO ======== Query completed for USDCNY ===========
+2023-11-21 18:54:25 WARNING some messages failed [None]
+2023-11-21 18:54:25 INFO ======== Query completed for AUDUSD ===========
+2023-11-21 18:54:26 INFO +++++++done with ticker USDHKD=X=======
+2023-11-21 18:54:26 INFO ======== Query completed for USDHKD ===========
+2023-11-21 18:54:27 INFO +++++++done with ticker EURGBP=X=======
+2023-11-21 18:54:27 INFO ======== Query completed for EURGBP ===========

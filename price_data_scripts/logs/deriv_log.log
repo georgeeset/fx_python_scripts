@@ -78,3 +78,44 @@
 2023-11-18 22:54:57 INFO ======== Query completed for Jump_100_Index ===========
 2023-11-18 22:54:59 WARNING some messages failed [None]
 2023-11-18 22:54:59 INFO ======== Query completed for Crash_1000_Index ===========
+2023-11-21 19:00:00 WARNING first attempt to run file
+2023-11-21 19:00:00 INFO starting  data collection for GoldUSD
+2023-11-21 19:01:01 WARNING first attempt to run file
+2023-11-21 19:01:01 INFO starting  data collection for GoldUSD
+2023-11-21 19:01:03 INFO =========End Query for GoldUSD==================
+2023-11-21 19:01:03 INFO starting  data collection for Volatility_50_Index
+2023-11-21 19:01:03 INFO ======== Query completed for GoldUSD ===========
+2023-11-21 19:01:03 INFO =========End Query for Volatility_50_Index==================
+2023-11-21 19:01:03 INFO starting  data collection for Volatility_75_Index
+2023-11-21 19:01:03 INFO ======== Query completed for Volatility_50_Index ===========
+2023-11-21 19:01:04 INFO =========End Query for Volatility_75_Index==================
+2023-11-21 19:01:04 INFO starting  data collection for Volatility_100_Index
+2023-11-21 19:01:04 INFO ======== Query completed for Volatility_75_Index ===========
+2023-11-21 19:01:04 INFO =========End Query for Volatility_100_Index==================
+2023-11-21 19:01:04 INFO starting  data collection for Step_Index
+2023-11-21 19:01:04 INFO ======== Query completed for Volatility_100_Index ===========
+2023-11-21 19:01:05 INFO =========End Query for Step_Index==================
+2023-11-21 19:01:05 INFO starting  data collection for Boom_500_Index
+2023-11-21 19:01:06 INFO =========End Query for Boom_500_Index==================
+2023-11-21 19:01:06 INFO starting  data collection for Boom_1000_Index
+2023-11-21 19:01:06 INFO ======== Query completed for Boom_500_Index ===========
+2023-11-21 19:01:07 INFO =========End Query for Boom_1000_Index==================
+2023-11-21 19:01:07 INFO starting  data collection for Crash_500_Index
+2023-11-21 19:01:07 INFO ======== Query completed for Boom_1000_Index ===========
+2023-11-21 19:01:08 INFO =========End Query for Crash_500_Index==================
+2023-11-21 19:01:08 INFO starting  data collection for Crash_1000_Index
+2023-11-21 19:01:08 INFO ======== Query completed for Crash_500_Index ===========
+2023-11-21 19:01:09 INFO =========End Query for Crash_1000_Index==================
+2023-11-21 19:01:09 INFO starting  data collection for Jump_50_Index
+2023-11-21 19:01:09 INFO =========End Query for Jump_50_Index==================
+2023-11-21 19:01:09 INFO starting  data collection for Jump_75_Index
+2023-11-21 19:01:09 INFO ======== Query completed for Jump_50_Index ===========
+2023-11-21 19:01:10 INFO all messsages sent [True]
+2023-11-21 19:01:10 INFO ======== Query completed for Step_Index ===========
+2023-11-21 19:01:10 INFO =========End Query for Jump_75_Index==================
+2023-11-21 19:01:10 INFO starting  data collection for Jump_100_Index
+2023-11-21 19:01:10 INFO ======== Query completed for Jump_75_Index ===========
+2023-11-21 19:01:11 INFO =========End Query for Jump_100_Index==================
+2023-11-21 19:01:11 INFO ======== Query completed for Jump_100_Index ===========
+2023-11-21 19:01:15 WARNING some messages failed [None]
+2023-11-21 19:01:15 INFO ======== Query completed for Crash_1000_Index ===========
