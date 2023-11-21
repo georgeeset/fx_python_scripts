@@ -68,7 +68,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'CLOSING PRICE IS LESS THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1].Close}
+        WHERE {constants.TARGET_COL} > {price_row.iloc[-1:].Close}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -77,7 +77,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'OPENING PRICE IS GREATER THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} < {price_row.iloc[-1].Open}
+        WHERE {constants.TARGET_COL} < {price_row.iloc[-1:].Open}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -86,7 +86,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'OPENING PRICE IS LESS THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1].Open}
+        WHERE {constants.TARGET_COL} > {price_row.iloc[-1:].Open}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -95,7 +95,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'HIGHEST PRICE IS GREATER THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} < {price_row.iloc[-1].High}
+        WHERE {constants.TARGET_COL} < {price_row.iloc[-1:].High}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -104,7 +104,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'HIGHEST PRICE IS LESS THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1].High}
+        WHERE {constants.TARGET_COL} > {price_row.iloc[-1:].High}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -113,7 +113,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'LOWEST PRICE IS GREATER THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} < {price_row.iloc[-1].Low}
+        WHERE {constants.TARGET_COL} < {price_row.iloc[-1:].Low}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
@@ -122,7 +122,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
 
         # 'LOWEST PRICE IS LESS THAN SETPOINT'
         f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1].Low}
+        WHERE {constants.TARGET_COL} > {price_row.iloc[-1:].Low}
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
