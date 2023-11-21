@@ -191,10 +191,11 @@ async def query_db(connection, query) -> None:
             # print(data[4])
             # candle time determines when to send message
             #data is tuple of tuple, we have to address with index
-            alert_detail = None
 
-            if time_frame_filter(data[4]):
-                alert_detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
+            if not time_frame_filter(data[4]):
+                # if timefrmae is not same with current time, continue
+                continue
+            alert_detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
 
             #convert to list first before accessing by index
             detail = list(alert_detail)[0]
