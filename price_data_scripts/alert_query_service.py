@@ -211,7 +211,7 @@ async def query_db(connection, query) -> None:
                 cdt=data[2], tgt=data[3], crtd=data[8],
                 rpt=data[5], exp=data[11], am=detail[0],
                 note=data[12], pair=data[1], tmf=data[4],
-                cnt=data[6]
+                cnt=(data[6] + 1)
                 )
             
             if detail[0] == constants.EMAIL:
