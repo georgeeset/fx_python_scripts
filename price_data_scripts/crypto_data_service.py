@@ -7,6 +7,7 @@ import logging
 import os
 import pandas as pd
 import constants
+from datetime import datetime
 from binance.spot import Spot
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
@@ -25,6 +26,11 @@ def data_handler(payload: list) -> pd.DataFrame:
                      'taker_base_vol','taker_quote_vol', 'ignore'
                      ],axis=1,inplace=True)
     price_data.set_index(constants.DATETIME,inplace=True)
+    # due to deriv api hourly agregation, the last row is not a complete hour.
+    if price_data.index[-1].hour == datetime.now().hour:
+        # print(price_data.index[-1])
+        # print("hour is same as current hour")
+        price_data.drop(price_data.index[-1], axis=0, inplace=True)
     return price_data
 
 async def crypto_data_service():
