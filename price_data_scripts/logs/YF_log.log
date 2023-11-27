@@ -118,3 +118,31 @@
 2023-11-21 22:02:47 INFO ======== Query completed for EURGBP ===========
 2023-11-21 22:02:47 WARNING some messages failed [None]
 2023-11-21 22:02:47 INFO ======== Query completed for AUDUSD ===========
+2023-11-27 16:37:51 INFO +++++++done with ticker EURUSD=X=======
+2023-11-27 16:37:52 INFO +++++++done with ticker AUDJPY=X=======
+2023-11-27 16:37:52 INFO ======== Query completed for AUDJPY ===========
+2023-11-27 16:37:52 INFO all messsages sent [True]
+2023-11-27 16:37:52 INFO ======== Query completed for EURUSD ===========
+2023-11-27 16:37:52 INFO +++++++done with ticker EURCHF=X=======
+2023-11-27 16:37:52 INFO ======== Query completed for EURCHF ===========
+2023-11-27 16:37:53 INFO +++++++done with ticker EURJPY=X=======
+2023-11-27 16:37:53 INFO ======== Query completed for EURJPY ===========
+2023-11-27 16:37:53 INFO +++++++done with ticker USDJPY=X=======
+2023-11-27 16:37:53 INFO ======== Query completed for USDJPY ===========
+2023-11-27 16:37:53 INFO +++++++done with ticker GBPUSD=X=======
+2023-11-27 16:37:53 INFO ======== Query completed for GBPUSD ===========
+2023-11-27 16:37:53 INFO +++++++done with ticker AUDUSD=X=======
+2023-11-27 16:37:54 INFO +++++++done with ticker USDCAD=X=======
+2023-11-27 16:37:54 INFO ======== Query completed for USDCAD ===========
+2023-11-27 16:37:54 INFO +++++++done with ticker USDCHF=X=======
+2023-11-27 16:37:54 INFO ======== Query completed for USDCHF ===========
+2023-11-27 16:37:54 INFO +++++++done with ticker CADCHF=X=======
+2023-11-27 16:37:54 INFO ======== Query completed for CADCHF ===========
+2023-11-27 16:37:55 INFO +++++++done with ticker CHFJPY=X=======
+2023-11-27 16:37:55 INFO ======== Query completed for CHFJPY ===========
+2023-11-27 16:37:55 INFO +++++++done with ticker USDHKD=X=======
+2023-11-27 16:37:55 INFO ======== Query completed for USDHKD ===========
+2023-11-27 16:37:55 INFO +++++++done with ticker EURGBP=X=======
+2023-11-27 16:37:55 INFO ======== Query completed for EURGBP ===========
+2023-11-27 16:37:56 WARNING some messages failed [None]
+2023-11-27 16:37:56 INFO ======== Query completed for AUDUSD ===========

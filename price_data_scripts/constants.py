@@ -33,15 +33,16 @@ DERIV_TICKERS = [
 """
 YF_TICKERS =   [  
     'EURUSD=X',
+    'AUDJPY=X',
+    'EURCHF=X',
     'EURJPY=X',
     'USDJPY=X',
     'GBPUSD=X',
     'AUDUSD=X',
     'USDCAD=X',
     'USDCHF=X',
-
     'CADCHF=X',
-    'USDCNY=X',
+    'CHFJPY=X',
     'USDHKD=X',
     'EURGBP=X',
     ]
