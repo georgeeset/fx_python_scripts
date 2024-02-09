@@ -1,3 +1,13 @@
+
 *.pyc
+
+# logs
 logs/*
 *.log
+
+# emacs
+*~
+*#
+
+# config file
+launcher.sh
