@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     # Exit if weekend
     week_num = datetime.today().weekday()
-    if week_num > 5:
+    if week_num > 4:
         exit()
 
     # Get the script's absolute path
