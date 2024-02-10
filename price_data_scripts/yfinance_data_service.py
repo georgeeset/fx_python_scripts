@@ -7,6 +7,7 @@ import yfinance as yf
 import pandas as pd
 import constants
 import asyncio
+from datetime import datetime
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
 
@@ -55,6 +56,12 @@ async def get_yf_data():
     await asyncio.gather(*query_async_tasks)
 
 if __name__ == '__main__':
+
+    # Exit if weekend
+    week_num = datetime.today().weekday()
+    if week_num > 5:
+        exit()
+
     # Get the script's absolute path
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
