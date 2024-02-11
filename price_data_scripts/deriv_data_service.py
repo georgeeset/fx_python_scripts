@@ -78,6 +78,9 @@ async def connect_attempt() -> None:
                         pair=f'{value[constants.TABLE]}_h1',
                         store_rows=-1,
                         )
+            
+            # TODO QUERY db to get h4 d1 w1 and m1 data
+            # then store in separate tables using store_in_db function
 
             #first rename the df column to help enable simless dataformat
             # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)

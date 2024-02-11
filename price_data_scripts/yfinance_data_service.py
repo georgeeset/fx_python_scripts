@@ -46,6 +46,9 @@ async def get_yf_data():
             continue
 
         store_in_db(data, pair=f'{item[:-2]}_h1')
+        
+        # TODO QUERY db to get h4 d1 w1 and m1 data
+        # then store in separate tables using store_in_db function
 
         # remove the -X1 from item
         query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2]))

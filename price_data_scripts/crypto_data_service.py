@@ -46,10 +46,14 @@ async def crypto_data_service():
         # my_client.exchange_info()
         # print(response)
         if response is None:
-            print("unable to get data for ticker {}".format(ticker))
+            logging.error("unable to get data for ticker {}".format(ticker))
 
         candles_data = data_handler(response)
         store_in_db(candles_data, f'{ticker}_h1', -1, False)
+
+        # TODO QUERY db to get h4 d1 w1 and m1 data
+        # then store in separate tables using store_in_db function
+
 
         query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=ticker))
         query_async_tasks.append(query_task)
