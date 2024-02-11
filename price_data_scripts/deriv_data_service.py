@@ -90,6 +90,9 @@ async def connect_attempt() -> None:
         logging.info(f"=========End Query for {value.get('table')}==================")
 
     await asyncio.gather(*query_async_tasks)
+    
+    #disconnect when done
+    api.disconnect()
 
 
 if __name__  == "__main__":
