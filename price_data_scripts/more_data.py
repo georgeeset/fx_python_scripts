@@ -10,10 +10,10 @@ import os
 import logging
 import aiosmtplib
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
 
-def tfQueryManager(instrument:str, source_table:str):
+def tf_query_manager(instrument:str, source_table:str):
     """
         query price data form hourly data and compile higher timeframe.
         args:
@@ -21,37 +21,81 @@ def tfQueryManager(instrument:str, source_table:str):
             source_table: table name for the database table
     """
 
-    now_time = datetime.now()
+    now_datetime = datetime.now()
+    queryStr = None
+    target_time = None
+    print(now_datetime)
+   
+    if now_datetime.hour % 4 != 0:
+        window = timedelta(hours=4)
+        target_time = now_datetime - window
+        print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
+        
+    if now_datetime.hour == 0:
+        pass
+    if now_datetime.weekday == 0:
+        pass
+    if now_datetime.day == 1:
+        pass
 
-    if now_time.hour % 4 == 0:
-        pass
-    if now_time.hour == 0:
-        pass
-    if now_time.weekday == 0:
-        pass
-    if now_time.day == 1:
-        pass
-
-    CONDITION_QUERY_SET = [
-        # SELECT Datetime, Open, High, Low, Close
-        # FROM Jump_100_Index_h1
-        # WHERE Datetime >= '2024-02-11 10:00:00';
+    # print(os.environ.get('STORAGE_MYSQL_USER'))
     
-        # 'Query for 4 hour data',
-        f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} < {price_row.iloc[-1][constants.CLOSE]}
-        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-        AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
-        """,
+    # Connect to the database
+    connection = pymysql.connect(
+        host=os.environ.get('STORAGE_MYSQL_HOST'),
+        user=os.environ.get('STORAGE_MYSQL_USER'),
+        password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
+        db=os.environ.get('STORAGE_MYSQL_DB')
+    )
 
-        # 'CLOSING PRICE IS LESS THAN SETPOINT'
-        f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1][constants.CLOSE]}
-        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-        AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
+    cursor = connection.cursor()
+    type(target_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    query_str = f"""
+        SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
+        FROM Jump_100_Index_h1
+        WHERE {constants.DATETIME} >= '{target_time.strftime("%Y-%m-%d %H:%M:%S")}'
+        ORDER BY {constants.DATETIME} ASC;
         """
-        ]
+    
+    cursor.execute(query_str)
+    data = cursor.fetchall()
+
+    df = pd.DataFrame(data, columns=[
+        constants.DATETIME,
+        constants.OPEN,
+        constants.HIGH,
+        constants.LOW,
+        constants.CLOSE]
+        )
+    
+    cursor.close()
+
+    print(df.head())
+
+    # CONDITION_QUERY_SET = [
+    #     # SELECT Datetime, Open, High, Low, Close
+    #     # FROM Jump_100_Index_h1
+    #     # WHERE Datetime >= '2024-02-11 10:00:00'
+    #     # ORDER BY Datetime ASC;
+    
+    #     # 'Query for 4 hour data',
+    #     f"""SELECT * FROM {constants.ALERTS_TABLE}
+    #     WHERE {constants.TARGET_COL} < {price_row.iloc[-1][constants.CLOSE]}
+    #     AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+    #     AND {constants.EXPIRATION_COL} >= NOW()
+    #     AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+    #     AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
+    #     """,
+
+    #     # 'CLOSING PRICE IS LESS THAN SETPOINT'
+    #     f"""SELECT * FROM {constants.ALERTS_TABLE}
+    #     WHERE {constants.TARGET_COL} > {price_row.iloc[-1][constants.CLOSE]}
+    #     AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
+    #     AND {constants.EXPIRATION_COL} >= NOW()
+    #     AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+    #     AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
+    #     """
+    #     ]
+
+tf_query_manager("EURUSD", "h1")
