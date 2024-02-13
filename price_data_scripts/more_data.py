@@ -26,17 +26,19 @@ def tf_query_manager(instrument:str, source_table:str):
     target_time = None
     print(now_datetime)
    
-    if now_datetime.hour % 4 != 0:
+    if now_datetime.hour % 4 == 0:
         window = timedelta(hours=4)
         target_time = now_datetime - window
-        print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
+        # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
         
     if now_datetime.hour == 0:
-        pass
+        window = timedelta(days=1)
+        target_time = now_datetime - window
     if now_datetime.weekday == 0:
-        pass
+        window = timedelta(weeks=1)
+        target_time = now_datetime - window
     if now_datetime.day == 1:
-        pass
+        window = timedelta()
 
     # print(os.environ.get('STORAGE_MYSQL_USER'))
     
@@ -57,7 +59,7 @@ def tf_query_manager(instrument:str, source_table:str):
         WHERE {constants.DATETIME} >= '{target_time.strftime("%Y-%m-%d %H:%M:%S")}'
         ORDER BY {constants.DATETIME} ASC;
         """
-    
+
     cursor.execute(query_str)
     data = cursor.fetchall()
 
