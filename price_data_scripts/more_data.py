@@ -3,6 +3,7 @@ module is to compile more data such as h4 d1, w1
 and m1 data to be store d in separate table
 """
 
+from calendar import calendar
 import pandas as pd
 import pymysql
 import constants
@@ -12,6 +13,13 @@ import aiosmtplib
 import requests
 from datetime import datetime, timedelta
 import asyncio
+
+def monthdelta(date, delta):
+    m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
+    if not m: m = 12
+    d = d = min(date.day, calendar.monthrange(y, m)[1])
+    return date.replace(day=d,month=m, year=y)
+
 
 def tf_query_manager(instrument:str, source_table:str):
     """
@@ -25,6 +33,14 @@ def tf_query_manager(instrument:str, source_table:str):
     queryStr = None
     target_time = None
     print(now_datetime)
+
+    target_ts = now_datetime - pd.DateOffset(months=1)
+    print(type(target_ts))
+    print(target_ts)
+    target_time = target_ts.to_pydatetime()
+    print(type(target_time))
+    print(target_time)
+
    
     if now_datetime.hour % 4 == 0:
         window = timedelta(hours=4)
@@ -38,7 +54,10 @@ def tf_query_manager(instrument:str, source_table:str):
         window = timedelta(weeks=1)
         target_time = now_datetime - window
     if now_datetime.day == 1:
-        window = timedelta()
+        # subtract one month from current date
+        target_ts = now_datetime - pd.DateOffset(months=1)
+        target_time = target_ts.to_pydatetime()
+
 
     # print(os.environ.get('STORAGE_MYSQL_USER'))
     
@@ -56,7 +75,7 @@ def tf_query_manager(instrument:str, source_table:str):
     query_str = f"""
         SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
         FROM Jump_100_Index_h1
-        WHERE {constants.DATETIME} >= '{target_time.strftime("%Y-%m-%d %H:%M:%S")}'
+        WHERE {constants.DATETIME} >= '{target_time}'
         ORDER BY {constants.DATETIME} ASC;
         """
 
