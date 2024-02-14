@@ -9,10 +9,9 @@ import pymysql
 import constants
 import os
 import logging
-import aiosmtplib
-import requests
 from datetime import datetime, timedelta
-import asyncio
+
+from db_storage_service import store_in_db
 
 def monthdelta(date, delta):
     m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
@@ -21,30 +20,21 @@ def monthdelta(date, delta):
     return date.replace(day=d,month=m, year=y)
 
 
-def tf_query_manager(instrument:str, source_table:str):
+def tf_query_manager(source_table:str):
     """
         query price data form hourly data and compile higher timeframe.
         args:
-            instrument: currency pair
             source_table: table name for the database table
     """
 
     now_datetime = datetime.now()
     queryStr = None
     target_time = None
-    print(now_datetime)
-
-    target_ts = now_datetime - pd.DateOffset(months=1)
-    print(type(target_ts))
-    print(target_ts)
-    target_time = target_ts.to_pydatetime()
-    print(type(target_time))
-    print(target_time)
-
    
     if now_datetime.hour % 4 == 0:
         window = timedelta(hours=4)
         target_time = now_datetime - window
+        upadte_table(source_table, f"{source_table[:-2]}h4", target_time)
         # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
         
     if now_datetime.hour == 0:
@@ -55,13 +45,19 @@ def tf_query_manager(instrument:str, source_table:str):
         target_time = now_datetime - window
     if now_datetime.day == 1:
         # subtract one month from current date
-        target_ts = now_datetime - pd.DateOffset(months=1)
+        target_ts = now_datetime - pd.DateOffset(months=1) 
         target_time = target_ts.to_pydatetime()
 
+def upadte_table(source_table: str, new_table: str, target_time: datetime ):
+    """
+        query hourly data table amd make a new table from it
+        args:
+            source_table:
+            new_table:
+            target_time:
+    """
 
-    # print(os.environ.get('STORAGE_MYSQL_USER'))
-    
-    # Connect to the database
+     # Connect to the database
     connection = pymysql.connect(
         host=os.environ.get('STORAGE_MYSQL_HOST'),
         user=os.environ.get('STORAGE_MYSQL_USER'),
@@ -70,19 +66,24 @@ def tf_query_manager(instrument:str, source_table:str):
     )
 
     cursor = connection.cursor()
-    type(target_time.strftime("%Y-%m-%d %H:%M:%S"))
+    # type(target_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    if not isinstance(target_time, datetime):
+        raise(TypeError, "target_time must be datetime datatype")
+    if not isinstance(source_table, str) or not isinstance(new_table, str):
+        raise(TypeError, "source_table and new_table must be string")
 
     query_str = f"""
         SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
-        FROM Jump_100_Index_h1
+        FROM {source_table}
         WHERE {constants.DATETIME} >= '{target_time}'
         ORDER BY {constants.DATETIME} ASC;
         """
-
     cursor.execute(query_str)
     data = cursor.fetchall()
 
-    df = pd.DataFrame(data, columns=[
+    # convert query response to pandas dataframe
+    df_result = pd.DataFrame(data, columns=[
         constants.DATETIME,
         constants.OPEN,
         constants.HIGH,
@@ -92,31 +93,38 @@ def tf_query_manager(instrument:str, source_table:str):
     
     cursor.close()
 
-    print(df.head())
+    print(df_result)
 
-    # CONDITION_QUERY_SET = [
-    #     # SELECT Datetime, Open, High, Low, Close
-    #     # FROM Jump_100_Index_h1
-    #     # WHERE Datetime >= '2024-02-11 10:00:00'
-    #     # ORDER BY Datetime ASC;
+    if len(df_result) == 0:
+        logging.error("no data found on database. for {}".format(new_table))
+        return
     
-    #     # 'Query for 4 hour data',
-    #     f"""SELECT * FROM {constants.ALERTS_TABLE}
-    #     WHERE {constants.TARGET_COL} < {price_row.iloc[-1][constants.CLOSE]}
-    #     AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-    #     AND {constants.EXPIRATION_COL} >= NOW()
-    #     AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-    #     AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
-    #     """,
+    open = df_result.iloc[0][constants.OPEN]
+    high = df_result[constants.HIGH].max()
+    low = df_result[constants.LOW].min()
+    close = df_result.iloc[-1][constants.CLOSE]
+    close_datetime = df_result.iloc[-1][constants.DATETIME]
 
-    #     # 'CLOSING PRICE IS LESS THAN SETPOINT'
-    #     f"""SELECT * FROM {constants.ALERTS_TABLE}
-    #     WHERE {constants.TARGET_COL} > {price_row.iloc[-1][constants.CLOSE]}
-    #     AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-    #     AND {constants.EXPIRATION_COL} >= NOW()
-    #     AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-    #     AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
-    #     """
-    #     ]
+    # print(close_datetime)
 
-tf_query_manager("EURUSD", "h1")
+    new_data = pd.DataFrame(data = {
+        constants.DATETIME: [close_datetime],
+        constants.OPEN: [open],
+        constants.HIGH: [high],
+        constants.LOW: [low],
+        constants.CLOSE: [close],
+        constants.VOLUME: [0],
+        }
+    )
+
+    new_data.set_index(constants.DATETIME, inplace=True)
+
+    for i in new_data.index:
+        print (i)
+    # print(type(new_data))
+    store_in_db(data=new_data,
+                pair=new_table
+                )
+
+    
+tf_query_manager("Jump_100_Index_h1")

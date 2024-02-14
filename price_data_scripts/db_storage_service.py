@@ -72,8 +72,8 @@ def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:b
         return False
 
     for item in trimed_data.index:
-        # print(item)
-        # print(trimed_data[constants.OPEN][item])
+        # print("trimmed_data", item)
+        # print(trimed_data[constants.DATETIME][item])
         # print(trimed_data.index[0])
         try:
             db_query = f"""REPLACE INTO {pair} (

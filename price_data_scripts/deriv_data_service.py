@@ -4,7 +4,7 @@ update database and send alerts
 """
 from deriv_api import DerivAPI
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 import constants
 import logging
 import os
@@ -50,14 +50,23 @@ async def connect_attempt() -> None:
     epoch_time = int(now.timestamp())
     # print(epoch_time)
 
+    # add timeout to terminate function when task gets stuck on connection
+    timeout = timedelta(minutes=5)
+
+
     chart_type = "candles"
     granularity = 3600 #seconds = 1 hour
     count = 10  # Number of hourly candles you want to retrieve
-
+    api = None
+    task = asyncio.create_task(DerivAPI(app_id=api_id))
     #connect to derif api socket
-    api = DerivAPI(app_id=api_id)
-
+    try:
+        api = await asyncio.wait_for (task, timeout=timeout)
+    except TimeoutError:
+        task.cancel()   # Attempt to cancel if timed out
+        return
     query_async_tasks = []
+    print(type(api))
 
     # Make the API request to get candles data
     for value in constants.DERIV_TICKERS:
@@ -92,7 +101,7 @@ async def connect_attempt() -> None:
     await asyncio.gather(*query_async_tasks)
 
     # disconnect when done
-    # api.disconnect()
+    api.disconnect()
 
 
 if __name__  == "__main__":

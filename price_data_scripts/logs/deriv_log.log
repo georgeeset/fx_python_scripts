@@ -269,3 +269,156 @@
 2024-02-13 19:31:31 INFO starting  data collection for GoldUSD
 2024-02-13 19:55:20 WARNING first attempt to run file
 2024-02-13 19:55:20 INFO starting  data collection for GoldUSD
+2024-02-14 08:59:49 WARNING first attempt to run file
+2024-02-14 08:59:49 INFO starting  data collection for GoldUSD
+2024-02-14 08:59:51 INFO =========End Query for GoldUSD==================
+2024-02-14 08:59:51 INFO starting  data collection for Volatility_50_Index
+2024-02-14 08:59:51 INFO ======== Query completed for GoldUSD ===========
+2024-02-14 08:59:51 INFO =========End Query for Volatility_50_Index==================
+2024-02-14 08:59:51 INFO starting  data collection for Volatility_75_Index
+2024-02-14 08:59:51 INFO ======== Query completed for Volatility_50_Index ===========
+2024-02-14 08:59:52 INFO =========End Query for Volatility_75_Index==================
+2024-02-14 08:59:52 INFO starting  data collection for Volatility_100_Index
+2024-02-14 08:59:52 INFO ======== Query completed for Volatility_75_Index ===========
+2024-02-14 08:59:52 INFO =========End Query for Volatility_100_Index==================
+2024-02-14 08:59:52 INFO starting  data collection for Step_Index
+2024-02-14 08:59:52 INFO ======== Query completed for Volatility_100_Index ===========
+2024-02-14 08:59:53 INFO =========End Query for Step_Index==================
+2024-02-14 08:59:53 INFO starting  data collection for Boom_500_Index
+2024-02-14 08:59:53 INFO ======== Query completed for Step_Index ===========
+2024-02-14 08:59:53 INFO =========End Query for Boom_500_Index==================
+2024-02-14 08:59:53 INFO starting  data collection for Boom_1000_Index
+2024-02-14 08:59:53 INFO ======== Query completed for Boom_500_Index ===========
+2024-02-14 08:59:54 INFO =========End Query for Boom_1000_Index==================
+2024-02-14 08:59:54 INFO starting  data collection for Crash_500_Index
+2024-02-14 08:59:54 INFO ======== Query completed for Boom_1000_Index ===========
+2024-02-14 08:59:55 INFO =========End Query for Crash_500_Index==================
+2024-02-14 08:59:55 INFO starting  data collection for Crash_1000_Index
+2024-02-14 08:59:55 INFO ======== Query completed for Crash_500_Index ===========
+2024-02-14 08:59:55 INFO =========End Query for Crash_1000_Index==================
+2024-02-14 08:59:55 INFO starting  data collection for Jump_50_Index
+2024-02-14 08:59:55 INFO ======== Query completed for Crash_1000_Index ===========
+2024-02-14 08:59:56 INFO =========End Query for Jump_50_Index==================
+2024-02-14 08:59:56 INFO starting  data collection for Jump_75_Index
+2024-02-14 08:59:56 INFO ======== Query completed for Jump_50_Index ===========
+2024-02-14 08:59:56 INFO =========End Query for Jump_75_Index==================
+2024-02-14 08:59:56 INFO starting  data collection for Jump_100_Index
+2024-02-14 08:59:56 INFO ======== Query completed for Jump_75_Index ===========
+2024-02-14 08:59:57 INFO =========End Query for Jump_100_Index==================
+2024-02-14 08:59:57 INFO ======== Query completed for Jump_100_Index ===========
+2024-02-14 10:03:22 WARNING first attempt to run file
+2024-02-14 10:03:22 INFO starting  data collection for GoldUSD
+2024-02-14 10:31:24 WARNING first attempt to run file
+2024-02-14 10:31:24 INFO starting  data collection for GoldUSD
+2024-02-14 10:31:26 INFO =========End Query for GoldUSD==================
+2024-02-14 10:31:26 INFO starting  data collection for Volatility_50_Index
+2024-02-14 10:31:26 INFO ======== Query completed for GoldUSD ===========
+2024-02-14 10:31:27 INFO =========End Query for Volatility_50_Index==================
+2024-02-14 10:31:27 INFO starting  data collection for Volatility_75_Index
+2024-02-14 10:31:27 INFO ======== Query completed for Volatility_50_Index ===========
+2024-02-14 10:31:27 INFO =========End Query for Volatility_75_Index==================
+2024-02-14 10:31:27 INFO starting  data collection for Volatility_100_Index
+2024-02-14 10:31:27 INFO ======== Query completed for Volatility_75_Index ===========
+2024-02-14 10:31:28 INFO =========End Query for Volatility_100_Index==================
+2024-02-14 10:31:28 INFO starting  data collection for Step_Index
+2024-02-14 10:31:28 INFO ======== Query completed for Volatility_100_Index ===========
+2024-02-14 10:31:28 INFO =========End Query for Step_Index==================
+2024-02-14 10:31:28 INFO starting  data collection for Boom_500_Index
+2024-02-14 10:31:28 INFO ======== Query completed for Step_Index ===========
+2024-02-14 10:31:29 INFO =========End Query for Boom_500_Index==================
+2024-02-14 10:31:29 INFO starting  data collection for Boom_1000_Index
+2024-02-14 10:31:29 INFO ======== Query completed for Boom_500_Index ===========
+2024-02-14 10:31:30 INFO =========End Query for Boom_1000_Index==================
+2024-02-14 10:31:30 INFO starting  data collection for Crash_500_Index
+2024-02-14 10:31:30 INFO ======== Query completed for Boom_1000_Index ===========
+2024-02-14 10:31:31 INFO =========End Query for Crash_500_Index==================
+2024-02-14 10:31:31 INFO starting  data collection for Crash_1000_Index
+2024-02-14 10:31:31 INFO ======== Query completed for Crash_500_Index ===========
+2024-02-14 10:31:31 INFO =========End Query for Crash_1000_Index==================
+2024-02-14 10:31:31 INFO starting  data collection for Jump_50_Index
+2024-02-14 10:31:31 INFO ======== Query completed for Crash_1000_Index ===========
+2024-02-14 10:31:32 INFO =========End Query for Jump_50_Index==================
+2024-02-14 10:31:32 INFO starting  data collection for Jump_75_Index
+2024-02-14 10:31:32 INFO ======== Query completed for Jump_50_Index ===========
+2024-02-14 10:31:33 INFO =========End Query for Jump_75_Index==================
+2024-02-14 10:31:33 INFO starting  data collection for Jump_100_Index
+2024-02-14 10:31:33 INFO ======== Query completed for Jump_75_Index ===========
+2024-02-14 10:31:34 INFO =========End Query for Jump_100_Index==================
+2024-02-14 10:31:34 INFO ======== Query completed for Jump_100_Index ===========
+2024-02-14 11:20:14 WARNING first attempt to run file
+2024-02-14 11:20:14 INFO starting  data collection for GoldUSD
+2024-02-14 11:20:16 INFO =========End Query for GoldUSD==================
+2024-02-14 11:20:16 INFO starting  data collection for Volatility_50_Index
+2024-02-14 11:20:16 INFO ======== Query completed for GoldUSD ===========
+2024-02-14 11:20:16 INFO =========End Query for Volatility_50_Index==================
+2024-02-14 11:20:16 INFO starting  data collection for Volatility_75_Index
+2024-02-14 11:20:16 INFO ======== Query completed for Volatility_50_Index ===========
+2024-02-14 11:20:17 INFO =========End Query for Volatility_75_Index==================
+2024-02-14 11:20:17 INFO starting  data collection for Volatility_100_Index
+2024-02-14 11:20:17 INFO ======== Query completed for Volatility_75_Index ===========
+2024-02-14 11:20:17 INFO =========End Query for Volatility_100_Index==================
+2024-02-14 11:20:17 INFO starting  data collection for Step_Index
+2024-02-14 11:20:17 INFO ======== Query completed for Volatility_100_Index ===========
+2024-02-14 11:20:18 INFO =========End Query for Step_Index==================
+2024-02-14 11:20:18 INFO starting  data collection for Boom_500_Index
+2024-02-14 11:20:18 INFO ======== Query completed for Step_Index ===========
+2024-02-14 11:20:18 INFO =========End Query for Boom_500_Index==================
+2024-02-14 11:20:18 INFO starting  data collection for Boom_1000_Index
+2024-02-14 11:20:18 INFO ======== Query completed for Boom_500_Index ===========
+2024-02-14 11:20:19 INFO =========End Query for Boom_1000_Index==================
+2024-02-14 11:20:19 INFO starting  data collection for Crash_500_Index
+2024-02-14 11:20:19 INFO ======== Query completed for Boom_1000_Index ===========
+2024-02-14 11:20:20 INFO =========End Query for Crash_500_Index==================
+2024-02-14 11:20:20 INFO starting  data collection for Crash_1000_Index
+2024-02-14 11:20:20 INFO ======== Query completed for Crash_500_Index ===========
+2024-02-14 11:20:20 INFO =========End Query for Crash_1000_Index==================
+2024-02-14 11:20:20 INFO starting  data collection for Jump_50_Index
+2024-02-14 11:20:21 INFO ======== Query completed for Crash_1000_Index ===========
+2024-02-14 11:20:21 INFO =========End Query for Jump_50_Index==================
+2024-02-14 11:20:21 INFO starting  data collection for Jump_75_Index
+2024-02-14 11:20:21 INFO ======== Query completed for Jump_50_Index ===========
+2024-02-14 11:20:22 INFO =========End Query for Jump_75_Index==================
+2024-02-14 11:20:22 INFO starting  data collection for Jump_100_Index
+2024-02-14 11:20:22 INFO ======== Query completed for Jump_75_Index ===========
+2024-02-14 11:20:23 INFO =========End Query for Jump_100_Index==================
+2024-02-14 11:20:23 INFO ======== Query completed for Jump_100_Index ===========
+2024-02-14 12:41:35 WARNING first attempt to run file
+2024-02-14 12:41:35 INFO starting  data collection for GoldUSD
+2024-02-14 12:41:37 INFO =========End Query for GoldUSD==================
+2024-02-14 12:41:37 INFO starting  data collection for Volatility_50_Index
+2024-02-14 12:41:37 INFO ======== Query completed for GoldUSD ===========
+2024-02-14 12:41:37 INFO =========End Query for Volatility_50_Index==================
+2024-02-14 12:41:37 INFO starting  data collection for Volatility_75_Index
+2024-02-14 12:41:37 INFO ======== Query completed for Volatility_50_Index ===========
+2024-02-14 12:41:37 INFO =========End Query for Volatility_75_Index==================
+2024-02-14 12:41:37 INFO starting  data collection for Volatility_100_Index
+2024-02-14 12:41:37 INFO ======== Query completed for Volatility_75_Index ===========
+2024-02-14 12:41:38 INFO =========End Query for Volatility_100_Index==================
+2024-02-14 12:41:38 INFO starting  data collection for Step_Index
+2024-02-14 12:41:38 INFO ======== Query completed for Volatility_100_Index ===========
+2024-02-14 12:41:38 INFO =========End Query for Step_Index==================
+2024-02-14 12:41:38 INFO starting  data collection for Boom_500_Index
+2024-02-14 12:41:38 INFO ======== Query completed for Step_Index ===========
+2024-02-14 12:41:39 INFO =========End Query for Boom_500_Index==================
+2024-02-14 12:41:39 INFO starting  data collection for Boom_1000_Index
+2024-02-14 12:41:39 INFO ======== Query completed for Boom_500_Index ===========
+2024-02-14 12:41:40 INFO =========End Query for Boom_1000_Index==================
+2024-02-14 12:41:40 INFO starting  data collection for Crash_500_Index
+2024-02-14 12:41:40 INFO ======== Query completed for Boom_1000_Index ===========
+2024-02-14 12:41:40 INFO =========End Query for Crash_500_Index==================
+2024-02-14 12:41:40 INFO starting  data collection for Crash_1000_Index
+2024-02-14 12:41:40 INFO ======== Query completed for Crash_500_Index ===========
+2024-02-14 12:41:41 INFO =========End Query for Crash_1000_Index==================
+2024-02-14 12:41:41 INFO starting  data collection for Jump_50_Index
+2024-02-14 12:41:41 INFO ======== Query completed for Crash_1000_Index ===========
+2024-02-14 12:41:41 INFO =========End Query for Jump_50_Index==================
+2024-02-14 12:41:41 INFO starting  data collection for Jump_75_Index
+2024-02-14 12:41:41 INFO ======== Query completed for Jump_50_Index ===========
+2024-02-14 12:41:42 INFO =========End Query for Jump_75_Index==================
+2024-02-14 12:41:42 INFO starting  data collection for Jump_100_Index
+2024-02-14 12:41:42 INFO ======== Query completed for Jump_75_Index ===========
+2024-02-14 12:41:43 INFO =========End Query for Jump_100_Index==================
+2024-02-14 12:41:43 INFO ======== Query completed for Jump_100_Index ===========
+2024-02-14 15:58:58 WARNING first attempt to run file
+2024-02-14 16:10:16 WARNING first attempt to run file
+2024-02-14 16:10:43 WARNING first attempt to run file
