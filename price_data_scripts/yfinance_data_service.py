@@ -10,6 +10,7 @@ import asyncio
 from datetime import datetime
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
+from more_data import tf_query_manager
 
 
 async def get_yf_data():
@@ -38,17 +39,18 @@ async def get_yf_data():
         #     constants.close: data[constants.close][item],
         #     })
 
-
-
         # print(len(price_data))
-        if not any(data):
-            print('No data received for {}'.format(item))
+        if not any(data) or data.empty:
+            logging.error('No data received for {}'.format(item))
             continue
 
-        store_in_db(data, pair=f'{item[:-2]}_h1')
-        
-        # TODO QUERY db to get h4 d1 w1 and m1 data
+        current_pair = f'{item[:-2]}_h1'
+
+        store_in_db(data, pair=current_pair)
+
+        # QUERY db to get h4 d1 w1 and m1 data
         # then store in separate tables using store_in_db function
+        tf_query_manager(current_pair)
 
         # remove the -X1 from item
         query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2]))
@@ -57,6 +59,7 @@ async def get_yf_data():
         logging.info(f"+++++++done with ticker {item}=======")
 
     await asyncio.gather(*query_async_tasks)
+
 
 if __name__ == '__main__':
 

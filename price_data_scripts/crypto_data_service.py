@@ -11,6 +11,7 @@ from datetime import datetime
 from binance.spot import Spot
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
+from more_data import tf_query_manager
 
 
 def data_handler(payload: list) -> pd.DataFrame:
@@ -48,12 +49,13 @@ async def crypto_data_service():
         if response is None:
             logging.error("unable to get data for ticker {}".format(ticker))
 
+        current_pair = f'{ticker}_h1'
         candles_data = data_handler(response)
-        store_in_db(candles_data, f'{ticker}_h1', -1, False)
+        store_in_db(candles_data, current_pair, -1, False)
 
-        # TODO QUERY db to get h4 d1 w1 and m1 data
+        # QUERY db to get h4 d1 w1 and m1 data
         # then store in separate tables using store_in_db function
-
+        tf_query_manager(current_pair)
 
         query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=ticker))
         query_async_tasks.append(query_task)
@@ -69,7 +71,7 @@ if __name__ == '__main__':
     logging.basicConfig(
     level = logging.INFO,
     filemode = 'a',
-    filename = os.path.join(script_dir, 'logs/cryto_log.log'),
+    filename = os.path.join(script_dir, 'logs/crypto_log.log'),
     format='%(asctime)s %(levelname)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     force = True

@@ -11,6 +11,7 @@ import os
 import pandas as pd
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
+from more_data import tf_query_manager
 
 
 def make_dataframe(candles: map) -> pd.DataFrame:
@@ -81,15 +82,17 @@ async def connect_attempt() -> None:
         if candles.get(constants.CANDLES):
             
             candles_data = make_dataframe(candles)
+            current_pair = f'{value[constants.TABLE]}_h1'
 
             store_in_db(data=candles_data,
-                        pair=f'{value[constants.TABLE]}_h1',
+                        pair=current_pair,
                         store_rows=-1,
                         )
             
-            # TODO QUERY db to get h4 d1 w1 and m1 data
+            # QUERY db to get h4 d1 w1 and m1 data
             # then store in separate tables using store_in_db function
-
+            tf_query_manager(current_pair)
+            
             #first rename the df column to help enable simless dataformat
             # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
             query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE]))

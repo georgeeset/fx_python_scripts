@@ -2,7 +2,7 @@
 *.pyc
 
 # logs
-logs/*
+price_dadta_scripts/logs/*
 *.log
 
 # emacs
