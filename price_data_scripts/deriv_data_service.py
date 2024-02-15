@@ -43,6 +43,11 @@ def make_dataframe(candles: map) -> pd.DataFrame:
 
 
 async def connect_attempt() -> None:
+    """
+        Connect to deriv socketio api, download data
+        store in database, query for user alert set,
+        send email to users whose alerts are triggered
+    """
     # Define your API key
     # api_key = os.environ.get('DERIV_API_KEY')
     api_id = '1089'
@@ -53,20 +58,14 @@ async def connect_attempt() -> None:
     # add timeout to terminate function when task gets stuck on connection
     timeout = timedelta(minutes=5)
 
-
     chart_type = "candles"
     granularity = 3600 #seconds = 1 hour
     count = 10  # Number of hourly candles you want to retrieve
-    api = None
-    task = asyncio.create_task(DerivAPI(app_id=api_id))
+
     #connect to derif api socket
-    try:
-        api = await asyncio.wait_for (task, timeout=timeout)
-    except TimeoutError:
-        task.cancel()   # Attempt to cancel if timed out
-        return
+    api = DerivAPI(app_id=api_id)
+
     query_async_tasks = []
-    print(type(api))
 
     # Make the API request to get candles data
     for value in constants.DERIV_TICKERS:
@@ -101,8 +100,28 @@ async def connect_attempt() -> None:
     await asyncio.gather(*query_async_tasks)
 
     # disconnect when done
-    api.disconnect()
+    await api.disconnect()
 
+async def task_function() -> None:
+    """
+    this functio is basically to manage the connection attempt function
+    it does not have timeout exception so I had to make a asymcio task
+    to manage the process and cancle it when it gets stuck due to network
+    faulure or server issues.
+    Note: it is hardcoded to terminate in 100 seconds which is sufficient for now
+    """
+
+    task = asyncio.create_task(connect_attempt())
+
+    try:
+        await asyncio.wait_for(task, timeout=100)
+    except asyncio.TimeoutError:
+        logging.error("Task timed out!")
+        task.cancel()  # Attempt to cancel if timed out
+        
+    else:
+        # Task completed successfully (can do cleanup here)
+        pass
 
 if __name__  == "__main__":
     # Get the script's absolute path
@@ -119,6 +138,6 @@ if __name__  == "__main__":
 
     logging.warning("first attempt to run file")
 
-    asyncio.run(connect_attempt())
+    asyncio.run(task_function())
 
 exit()
