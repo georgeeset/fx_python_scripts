@@ -26,8 +26,58 @@ from email.mime.text import MIMEText
 
 # logging.warning("first attempt to run file")
 
+def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
+    """
+        Get the most recent data row of an instrument table for processing
+        args:
+            instument: currency pair, will be used to locate the data table
+            timeframe: used to indicate the timeframe. will be combined with 
+                        instrument to locate the datateble to query
+            connection: database connection details
+        return: dataframe containing the latest price row, ordered by datetime
 
-async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
+    """
+    source_table = instrument+'_'+timeframe
+
+    # # Connect to the database
+    # connection = pymysql.connect(
+    #     host=os.environ.get('STORAGE_MYSQL_HOST'),
+    #     user=os.environ.get('STORAGE_MYSQL_USER'),
+    #     password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
+    #     db=os.environ.get('STORAGE_MYSQL_DB')
+    # )
+
+    # cursor = connection.cursor()
+    query_str = f"""
+            SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
+            FROM {source_table}
+            ORDER BY {constants.DATETIME} ASC
+            LIMIT 1;
+            """
+    
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute(query_str)
+            data = cursor.fetchall()
+        except Exception:
+            print("query error: ", Exception)
+            return pd.DataFrame() # empty dataframe
+
+        # convert query response to pandas dataframe
+        df_result = pd.DataFrame(data, columns=[
+            constants.DATETIME,
+            constants.OPEN,
+            constants.HIGH,
+            constants.LOW,
+            constants.CLOSE]
+            )
+
+        print(df_result)
+
+        return df_result()
+
+
+async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe: str):
     """
     query alert db to get recently trigered alerts and send alerts to the affected users accordingly
     params:
@@ -42,14 +92,16 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
     if not isinstance(price_row, pd.DataFrame):
         raise ValueError('Value must be a dataframe with OHLC daeta')
     
+    if not isinstance(instrument, str) or not isinstance(timeframe, str):
+        raise ValueError('Instument and Timeframe must be string')
+    
+    if instrument==None or timeframe == None:
+        raise ValueError('instrument and timeframe must not be None')
+    
     print('query task started. instrument ->', instrument)
     # print('open', price_row.Close[-1])
 
-    if price_row.empty:
-        logging.info('data contains nan no need to query')
-        return
-
-    # Connect to the database
+    # db Connection details setup
     connection = pymysql.connect(
         host=os.environ.get('STORAGE_MYSQL_HOST'),
         user=os.environ.get('STORAGE_MYSQL_USER'),
@@ -57,8 +109,18 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         db=os.environ.get('STORAGE_MYSQL_DB')
     )
 
+    if timeframe != constants.H1:
+        # get row from mysql table if timeframe is not h1
+        price_row = query_row(instrument, timeframe, connection)
 
-    
+    if price_row.empty:
+        logging.info('data contains nan no need to query')
+        return
+
+   
+
+
+    # list of query for all user accessible alert conditions
     CONDITION_QUERY_SET = [
 
         # 'CLOSING PRICE IS GREATER THAN SETPOINT',
@@ -67,6 +129,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
         """,
 
@@ -76,6 +139,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
         """,
 
@@ -85,6 +149,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS GREATER THAN SETPOINT';
         """,
 
@@ -94,6 +159,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS LESS THAN SETPOINT';
         """,
 
@@ -103,6 +169,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS GREATER THAN SETPOINT';
         """,
 
@@ -112,6 +179,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS LESS THAN SETPOINT';
         """,
 
@@ -121,6 +189,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS GREATER THAN SETPOINT';
         """,
 
@@ -130,6 +199,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str):
         AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
+        AND {constants.TIMEFRAME} = '{timeframe}'
         AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS LESS THAN SETPOINT';
         """
     ]
@@ -192,9 +262,11 @@ async def query_db(connection, query) -> None:
             # candle time determines when to send message
             #data is tuple of tuple, we have to address with index
 
-            if not time_frame_filter(data[4]):
-                # if timefrmae is not same with current time, continue
-                continue
+            #==============no need to check timeframe since timeframe is included in query=========
+            # if not time_frame_filter(data[4]):
+            #     # if timefrmae is not same with current time, continue
+            #     continue
+
             alert_detail = get_alert_details(connection, alert_id=data[13], user_id=data[14])
 
             #convert to list first before accessing by index

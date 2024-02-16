@@ -11,12 +11,15 @@ from datetime import datetime
 from binance.spot import Spot
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
-from more_data import tf_query_manager
+from more_data import tf_query_manager, measured_time
 
 
 def data_handler(payload: list) -> pd.DataFrame:
     """
     Clean up payload message and return ohlcv dataframe
+    args:
+        payload: list of raw data received from server
+    return: pandas dataframed cleaned up for processing
     """
     price_data = pd.DataFrame(payload, columns=constants.KLINE_COLUMN_NAMES)
     price_data[constants.DATETIME] = pd.to_datetime(
@@ -40,6 +43,7 @@ async def crypto_data_service():
     """
     my_client = Spot()
     query_async_tasks = []
+    now = datetime.now()
 
     for ticker in constants.CRYPTO_TICKERS:
         response = my_client.klines(ticker, "1h", limit=10)
@@ -57,8 +61,25 @@ async def crypto_data_service():
         # then store in separate tables using store_in_db function
         tf_query_manager(current_pair)
 
-        query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=ticker))
+
+        # Query for H1 alerts only and send emails
+        query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=ticker, timeframe=constants.H1))
         query_async_tasks.append(query_task)
+
+        # Query for other timeframe alerts and send emails also
+        # TODO for other timeframe, check if time is right before querying the other timeframe
+        if measured_time(now) == constants.H4:
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.H4))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.D1:
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.D1))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.W1:  
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.W1))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.M1:  
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.M1))
+            query_async_tasks.append(query_task)
 
         print(f"=========End data_colleciton for {ticker}==================")
     await asyncio.gather(*query_async_tasks)

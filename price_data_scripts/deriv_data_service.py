@@ -11,7 +11,7 @@ import os
 import pandas as pd
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
-from more_data import tf_query_manager
+from more_data import tf_query_manager, measured_time
 
 
 def make_dataframe(candles: map) -> pd.DataFrame:
@@ -56,9 +56,6 @@ async def connect_attempt() -> None:
     epoch_time = int(now.timestamp())
     # print(epoch_time)
 
-    # add timeout to terminate function when task gets stuck on connection
-    timeout = timedelta(minutes=5)
-
     chart_type = "candles"
     granularity = 3600 #seconds = 1 hour
     count = 10  # Number of hourly candles you want to retrieve
@@ -70,7 +67,7 @@ async def connect_attempt() -> None:
 
     # Make the API request to get candles data
     for value in constants.DERIV_TICKERS:
-        
+
         logging.info(f"starting  data collection for {value.get('table')}")
 
         candles = await api.ticks_history(
@@ -80,7 +77,7 @@ async def connect_attempt() -> None:
             })
 
         if candles.get(constants.CANDLES):
-            
+
             candles_data = make_dataframe(candles)
             current_pair = f'{value[constants.TABLE]}_h1'
 
@@ -91,12 +88,27 @@ async def connect_attempt() -> None:
             
             # QUERY db to get h4 d1 w1 and m1 data
             # then store in separate tables using store_in_db function
+            # print(current_pair)
             tf_query_manager(current_pair)
-            
+
             #first rename the df column to help enable simless dataformat
             # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
-            query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE]))
+            query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE], timeframe=constants.H1))
             query_async_tasks.append(query_task)
+
+            # TODO for other timeframe, check if time is right before querying the other timeframe
+            if measured_time(now) == constants.H4:
+                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.H4))
+                query_async_tasks.append(query_task)
+            if measured_time(now) == constants.D1:
+                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.D1))
+                query_async_tasks.append(query_task)
+            if measured_time(now) == constants.W1:  
+                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.W1))
+                query_async_tasks.append(query_task)
+            if measured_time(now) == constants.M1:  
+                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.M1))
+                query_async_tasks.append(query_task)
 
         logging.info(f"=========End Query for {value.get('table')}==================")
 
@@ -121,7 +133,7 @@ async def task_function() -> None:
     except asyncio.TimeoutError:
         logging.error("Task timed out!")
         task.cancel()  # Attempt to cancel if timed out
-        
+
     else:
         # Task completed successfully (can do cleanup here)
         pass
