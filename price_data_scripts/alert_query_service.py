@@ -51,7 +51,7 @@ def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
     query_str = f"""
             SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
             FROM {source_table}
-            ORDER BY {constants.DATETIME} ASC
+            ORDER BY {constants.DATETIME} DESC
             LIMIT 1;
             """
     
@@ -74,7 +74,7 @@ def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
 
         print(df_result)
 
-        return df_result()
+        return df_result
 
 
 async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe: str):

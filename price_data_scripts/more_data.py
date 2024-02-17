@@ -39,33 +39,33 @@ def tf_query_manager(source_table:str):
     """
 
     now_datetime = datetime.now()
-    queryStr = None
+
     target_time = None
    
     if measured_time(now_datetime) == constants.H4: # 4 hourly
         window = timedelta(hours=4)
         target_time = now_datetime - window
-        upadte_table(source_table, f"{source_table[:-2]}h4", target_time)
+        upadte_table(source_table, source_table[:-2] + constants.H4, target_time)
         logging.info("h4 row added")
         # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
         
     if measured_time(now_datetime) == constants.D1: # daily
         window = timedelta(days=1)
         target_time = now_datetime - window
-        upadte_table(source_table, f"{source_table[:-2]}d1", target_time)
+        upadte_table(source_table, source_table[:-2] + constants.D1, target_time)
         logging.info("d1 row added")
 
     if measured_time(now_datetime) == constants.W1: # weekly
         window = timedelta(weeks=1)
         target_time = now_datetime - window
-        upadte_table(source_table, f"{source_table[:-2]}w1", target_time)
+        upadte_table(source_table, source_table[:-2] + constants.W1, target_time)
         logging.info("w1 row added")
 
     if measured_time(now_datetime) == constants.M1: # monthly
         # subtract one month from current date
         target_ts = now_datetime - pd.DateOffset(months=1) 
         target_time = target_ts.to_pydatetime()
-        upadte_table(source_table, f"{source_table[:-2]}m1", target_time)
+        upadte_table(source_table, source_table[:-2] + constants.M1, target_time)
         logging.info("m1 row added")
     
     if measured_time(now_datetime) == None:
@@ -116,12 +116,12 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
     
     cursor.close()
 
-    print(df_result)
+    # print(df_result)
 
     if len(df_result) == 0:
         logging.error("no data found on database. for {}".format(new_table))
         return
-    
+
     open = df_result.iloc[0][constants.OPEN]
     high = df_result[constants.HIGH].max()
     low = df_result[constants.LOW].min()
@@ -142,8 +142,9 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
 
     new_data.set_index(constants.DATETIME, inplace=True)
 
-    for i in new_data.index:
-        print (i)
+    # for i in new_data.index:
+    #     print (i)
+
     # print(type(new_data))
     store_in_db(data=new_data,
                 pair=new_table
