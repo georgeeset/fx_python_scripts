@@ -38,16 +38,6 @@ def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
 
     """
     source_table = instrument+'_'+timeframe
-
-    # # Connect to the database
-    # connection = pymysql.connect(
-    #     host=os.environ.get('STORAGE_MYSQL_HOST'),
-    #     user=os.environ.get('STORAGE_MYSQL_USER'),
-    #     password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
-    #     db=os.environ.get('STORAGE_MYSQL_DB')
-    # )
-
-    # cursor = connection.cursor()
     query_str = f"""
             SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
             FROM {source_table}
@@ -98,7 +88,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
     if instrument==None or timeframe == None:
         raise ValueError('instrument and timeframe must not be None')
     
-    print('query task started. instrument ->', instrument)
+    print('query task started. instrument ->{} {}'.format( instrument, timeframe))
     # print('open', price_row.Close[-1])
 
     # db Connection details setup

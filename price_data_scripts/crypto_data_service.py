@@ -81,7 +81,7 @@ async def crypto_data_service():
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.M1))
             query_async_tasks.append(query_task)
 
-        print(f"=========End data_colleciton for {ticker}==================")
+        # print(f"=========End data_colleciton for {ticker}==================")
     await asyncio.gather(*query_async_tasks)
 
 
