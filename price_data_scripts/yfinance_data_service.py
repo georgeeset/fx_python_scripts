@@ -10,13 +10,14 @@ import asyncio
 from datetime import datetime
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
-from more_data import tf_query_manager
+from more_data import tf_query_manager, measured_time
 
 
 async def get_yf_data():
 
     data = pd.DataFrame()
     query_async_tasks = []
+    now = datetime.now()
     # try:
     #     data = yf.download(tickers=constants.tickers, period='1d', interval='60m') # , session=session)
     # except Exception as e:
@@ -52,9 +53,24 @@ async def get_yf_data():
         # then store in separate tables using store_in_db function
         tf_query_manager(current_pair)
 
-        # remove the -X1 from item
-        query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2]))
+        # Query for H1 alerts only and send emails
+        query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2], timeframe=constants.H1))
         query_async_tasks.append(query_task)
+
+        # Query for other timeframe alerts and send emails also
+        # TODO for other timeframe, check if time is right before querying the other timeframe
+        if measured_time(now) == constants.H4:
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=item[:-2], timeframe=constants.H4))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.D1:
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=item[:-2], timeframe=constants.D1))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.W1:  
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=item[:-2], timeframe=constants.W1))
+            query_async_tasks.append(query_task)
+        if measured_time(now) == constants.M1:  
+            query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=item[:-2], timeframe=constants.M1))
+            query_async_tasks.append(query_task)
 
         logging.info(f"+++++++done with ticker {item}=======")
 

@@ -80,12 +80,12 @@ def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
 async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe: str):
     """
     query alert db to get recently trigered alerts and send alerts to the affected users accordingly
-    params:
-    price_row: is the latest price dataframe, the function will check if
-    alerts has been triggered by referencing the last item on the price row dataframe
+    args:
+        price_row: is the latest price dataframe, the function will check if
+        alerts has been triggered by referencing the last item on the price row dataframe
 
-    instrument: str name of he currency pair or instrument for reference purpose while
-    searching db for possible triggered price alert
+        instrument: str name of he currency pair or instrument for reference purpose while
+        searching db for possible triggered price alert
     """
     # pair_table = '{}_h1'.format(instrument)
 
