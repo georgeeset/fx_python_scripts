@@ -19,15 +19,23 @@ def monthdelta(date, delta):
     d = d = min(date.day, calendar.monthrange(y, m)[1])
     return date.replace(day=d,month=m, year=y)
 
-def measured_time(now_datetime: datetime) -> str:
-    if now_datetime.hour % 4 == 0: # 4 hourly
-        return constants.H4
-    if now_datetime.hour == 0: # daily
-        return constants.D1
-    if now_datetime.weekday == 0: # weekly
-        return constants.W1
-    if now_datetime.day == 1: # monthly
-        return constants.M1
+def measured_time(now_datetime:datetime, expected:str) -> str:
+    """
+        checks the given time if it is right for next candle stick to start
+        args:
+            now_datetime: datetime to be checked
+            expected: expected result to to avoid returning only first correct value
+        return: String expected or none
+    """
+
+    if expected == constants.H4 and (now_datetime.hour % 4 == 0): # 4 hourly
+        return expected
+    if expected == constants.D1 and (now_datetime.hour == 0): # daily
+        return expected
+    if expected == constants.W1 and (now_datetime.weekday == 0): # weekly
+        return expected
+    if expected == constants.M1 and (now_datetime.day == 1): # monthly
+        return expected
     return None
 
 
@@ -42,34 +50,31 @@ def tf_query_manager(source_table:str):
 
     target_time = None
    
-    if measured_time(now_datetime) == constants.H4: # 4 hourly
+    if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
         window = timedelta(hours=4)
         target_time = now_datetime - window
         upadte_table(source_table, source_table[:-2] + constants.H4, target_time)
-        logging.info("h4 row added")
+        logging.info("H4 row added")
         # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
         
-    if measured_time(now_datetime) == constants.D1: # daily
+    if measured_time(now_datetime, constants.D1) == constants.D1: # daily
         window = timedelta(days=1)
         target_time = now_datetime - window
         upadte_table(source_table, source_table[:-2] + constants.D1, target_time)
-        logging.info("d1 row added")
+        logging.info("D1 row added")
 
-    if measured_time(now_datetime) == constants.W1: # weekly
+    if measured_time(now_datetime, constants.W1) == constants.W1: # weekly
         window = timedelta(weeks=1)
         target_time = now_datetime - window
         upadte_table(source_table, source_table[:-2] + constants.W1, target_time)
-        logging.info("w1 row added")
+        logging.info("W1 row added")
 
-    if measured_time(now_datetime) == constants.M1: # monthly
+    if measured_time(now_datetime, constants.M1) == constants.M1: # monthly
         # subtract one month from current date
         target_ts = now_datetime - pd.DateOffset(months=1) 
         target_time = target_ts.to_pydatetime()
         upadte_table(source_table, source_table[:-2] + constants.M1, target_time)
-        logging.info("m1 row added")
-    
-    if measured_time(now_datetime) == None:
-        logging.info("not yet time")
+        logging.info("M1 row added")
 
 def upadte_table(source_table: str, new_table: str, target_time: datetime ):
     """

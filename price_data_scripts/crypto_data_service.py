@@ -68,16 +68,16 @@ async def crypto_data_service():
 
         # Query for other timeframe alerts and send emails also
         # TODO for other timeframe, check if time is right before querying the other timeframe
-        if measured_time(now) == constants.H4:
+        if measured_time(now, constants.H4) == constants.H4:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.H4))
             query_async_tasks.append(query_task)
-        if measured_time(now) == constants.D1:
+        if measured_time(now, constants.D1) == constants.D1:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.D1))
             query_async_tasks.append(query_task)
-        if measured_time(now) == constants.W1:  
+        if measured_time(now, constants.W1) == constants.W1:  
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.W1))
             query_async_tasks.append(query_task)
-        if measured_time(now) == constants.M1:  
+        if measured_time(now, constants.M1) == constants.M1:  
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.M1))
             query_async_tasks.append(query_task)
 
