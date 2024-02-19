@@ -23,7 +23,7 @@ async def get_yf_data():
         data = fetch_yf(item, period='1d', interval='60m' )
 
         # print(len(price_data))
-        if not data:
+        if data.empty:
             logging.error(f"faild to download data for {item} - 60m")
             continue
 
