@@ -72,7 +72,7 @@ class DerivManager:
                 }
             )
         except Exception as e:
-            raise RecursionError(f"Failed to fetch candle data {pair}: {e}") from e
+            raise ConnectionError(f"Failed to fetch candle data {pair}: {e}") from e
 
         # validate data received
         if data.get(constants.CANDLES):
