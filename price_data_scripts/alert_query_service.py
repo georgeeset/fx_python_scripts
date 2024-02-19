@@ -51,6 +51,7 @@ def query_row(instrument:str, timeframe:str, connection) -> pd.DataFrame:
             data = cursor.fetchall()
         except Exception as err:
             print("query error: {}".format(str(err)),)
+            logging.error("query error at {} => {}: {}".format(instrument, timeframe,str(err)))
             return pd.DataFrame() # empty dataframe
 
         # convert query response to pandas dataframe

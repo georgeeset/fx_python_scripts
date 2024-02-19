@@ -3,7 +3,6 @@
 """
 import logging
 import os
-import yfinance as yf
 import pandas as pd
 import constants
 import asyncio
@@ -11,38 +10,21 @@ from datetime import datetime
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
 from more_data import tf_query_manager, measured_time
+from data_source.yf import fetch_yf
 
 
 async def get_yf_data():
 
-    data = pd.DataFrame()
+    
     query_async_tasks = []
     now = datetime.now()
-    # try:
-    #     data = yf.download(tickers=constants.tickers, period='1d', interval='60m') # , session=session)
-    # except Exception as e:
-    #     print('failed collecting data: {}'.format(e))
-
-
-    # print(data['Open'][constants.tickers[0]])
-    # print(len(data))
 
     for item in constants.YF_TICKERS:
-
-        data = await asyncio.to_thread(yf.download, tickers=item, period='1d', interval='60m' )
-
-        # print(data)
-
-        # price_data = pd.DataFrame(
-        #     {constants.open: data[constants.open][item],
-        #     constants.high: data[constants.high][item],
-        #     constants.low: data[constants.low][item],
-        #     constants.close: data[constants.close][item],
-        #     })
+        data = fetch_yf(item, period='1d', interval='60m' )
 
         # print(len(price_data))
-        if not any(data) or data.empty:
-            logging.error('No data received for {}'.format(item))
+        if not data:
+            logging.error(f"faild to download data for {item} - 60m")
             continue
 
         current_pair = f'{item[:-2]}_h1'
@@ -81,7 +63,12 @@ if __name__ == '__main__':
 
     # Exit if weekend
     week_num = datetime.today().weekday()
+    current_hour = datetime.now().hour
     if week_num > 4:
+        exit()
+
+    if week_num == 0 and current_hour == 0:
+        print("wait for one more hour")
         exit()
 
     # Get the script's absolute path
