@@ -118,7 +118,7 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
         constants.LOW,
         constants.CLOSE]
         )
-    
+
     cursor.close()
 
     # print(df_result)
