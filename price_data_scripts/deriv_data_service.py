@@ -2,7 +2,6 @@
 """Module used to fetch price from deriv,
 update database and send alerts
 """
-from deriv_api import DerivAPI
 import asyncio
 from datetime import datetime, timedelta
 import constants
@@ -12,35 +11,7 @@ import pandas as pd
 from db_storage_service import store_in_db
 from alert_query_service import alert_query_manager
 from more_data import tf_query_manager, measured_time
-
-
-def make_dataframe(candles: map) -> pd.DataFrame:
-    """ Convert map data to pandas Dataframe with
-    all fields named with first later capitalized.
-    e.g: Open Low...
-    Args:
-        candles: ohlc data from candlestick data
-    """
-    dict_data = {constants.DATETIME: [],
-                            constants.OPEN: [],
-                            constants.HIGH: [],
-                            constants.LOW: [],
-                            constants.CLOSE: []
-                            }
-
-    # Fill data into dataframe
-    for candle in candles.get(constants.CANDLES):
-        dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH)))
-        dict_data[constants.OPEN].append(candle.get(constants.OPEN.lower()))
-        dict_data[constants.HIGH].append(candle.get(constants.HIGH.lower()))
-        dict_data[constants.LOW].append(candle.get(constants.LOW.lower()))
-        dict_data[constants.CLOSE].append(candle.get(constants.CLOSE.lower()))
-        # No volume
-
-    candles_data = pd.DataFrame.from_dict(dict_data)
-    candles_data.set_index(constants.DATETIME, inplace=True)
-    # print(candles_data)
-    return candles_data
+from data_source.deriv import DerivManager
 
 
 async def connect_attempt() -> None:
@@ -51,7 +22,7 @@ async def connect_attempt() -> None:
     """
     # Define your API key
     # api_key = os.environ.get('DERIV_API_KEY')
-    api_id = '1089'
+    api_id = 1089
     now = datetime.now()
     epoch_time = int(now.timestamp())
     # print(epoch_time)
@@ -61,8 +32,10 @@ async def connect_attempt() -> None:
     count = 10  # Number of hourly candles you want to retrieve
 
     #connect to derif api socket
-    api = DerivAPI(app_id=api_id)
+    # api = DerivAPI(app_id=api_id)
 
+    deriv_data = DerivManager()
+    await deriv_data.connect()
     query_async_tasks = []
 
     # Make the API request to get candles data
@@ -70,52 +43,55 @@ async def connect_attempt() -> None:
 
         logging.info(f"starting  data collection for {value.get('table')}")
 
-        candles = await api.ticks_history(
-            {'ticks_history': value[constants.ID], 'style': chart_type,
-            'granularity': granularity, 'count': count,
-            'end': str(epoch_time)
-            })
+        try:
+            candles = await deriv_data.fetch_candles(pair = value[constants.ID],
+                                                        frame = granularity,
+                                                        size = count,
+                                                        end_time =str(epoch_time)
+                                                        )
+        except Exception as e:
+            logging.error(str(e))
+            continue
+        else:
+            if not candles.empty:
+                # candles_data = make_dataframe(candles)
+                current_pair = f'{value[constants.TABLE]}_h1'
 
-        if candles.get(constants.CANDLES):
+                store_in_db(data=candles,
+                            pair=current_pair,
+                            store_rows=-1,
+                            )
 
-            candles_data = make_dataframe(candles)
-            current_pair = f'{value[constants.TABLE]}_h1'
+                # QUERY db to get h4 d1 w1 and m1 data
+                # then store in separate tables using store_in_db function
+                # print(current_pair)
+                tf_query_manager(current_pair)
 
-            store_in_db(data=candles_data,
-                        pair=current_pair,
-                        store_rows=-1,
-                        )
-            
-            # QUERY db to get h4 d1 w1 and m1 data
-            # then store in separate tables using store_in_db function
-            # print(current_pair)
-            tf_query_manager(current_pair)
-
-            #first rename the df column to help enable simless dataformat
-            # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
-            query_task = asyncio.create_task(alert_query_manager(candles_data, instrument=value[constants.TABLE], timeframe=constants.H1))
-            query_async_tasks.append(query_task)
-
-            # TODO for other timeframe, check if time is right before querying the other timeframe
-            if measured_time(now, constants.H4) == constants.H4:
-                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.H4))
+                #first rename the df column to help enable simless dataformat
+                # candles_data.rename({'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close'}, axis=1, inplace=True)
+                query_task = asyncio.create_task(alert_query_manager(candles, instrument=value[constants.TABLE], timeframe=constants.H1))
                 query_async_tasks.append(query_task)
-            if measured_time(now, constants.D1) == constants.D1:
-                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.D1))
-                query_async_tasks.append(query_task)
-            if measured_time(now, constants.W1) == constants.W1:  
-                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.W1))
-                query_async_tasks.append(query_task)
-            if measured_time(now, constants.M1) == constants.M1:  
-                query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.M1))
-                query_async_tasks.append(query_task)
+
+                # TODO for other timeframe, check if time is right before querying the other timeframe
+                if measured_time(now, constants.H4) == constants.H4:
+                    query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.H4))
+                    query_async_tasks.append(query_task)
+                if measured_time(now, constants.D1) == constants.D1:
+                    query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.D1))
+                    query_async_tasks.append(query_task)
+                if measured_time(now, constants.W1) == constants.W1:  
+                    query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.W1))
+                    query_async_tasks.append(query_task)
+                if measured_time(now, constants.M1) == constants.M1:  
+                    query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=value[constants.TABLE], timeframe=constants.M1))
+                    query_async_tasks.append(query_task)
 
         logging.info(f"=========End Query for {value.get('table')}==================")
 
     await asyncio.gather(*query_async_tasks)
 
     # disconnect when done
-    await api.disconnect()
+    await deriv_data.disconnect();
 
 async def task_function() -> None:
     """

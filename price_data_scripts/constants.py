@@ -81,6 +81,7 @@ EPOCH = 'epoch'
 VOLUME = 'Volume'
 TABLE = 'table'
 ID = 'id'
+SECSINHR = 36000 # seconds in one hour
 
 QUERY = 'query'
 
