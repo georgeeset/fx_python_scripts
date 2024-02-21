@@ -7,6 +7,7 @@ import pandas as pd
 def fetch_yf(pair: str, period:str = '1d', interval:str = '60m') -> pd.DataFrame:
     """
     scrape data from yf
+    
     args:
         pair: currency pair requested
         period: timeframe of data request
