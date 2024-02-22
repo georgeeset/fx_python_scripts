@@ -6,91 +6,132 @@ import constants
 import os
 import logging
 
-def store_in_db(data:pd.DataFrame, pair:str, store_rows:int = -1, clear_tables:bool = False) -> bool:
-    """
-    receive map of Deriv prices data and store in database.
-    args:
-        data: must be in this format -> {'pair': 'EURUSD', 'data': pandas dataframe:}
-        store_rows: the number of rows to store. starting from the bottom.
-                    the value must be nagative. e.g -2 ->[-2:]
-    return: bool of update status success = True failed = False
-    """
 
-    # Connect to the database
-    connection = pymysql.connect(
-        host=os.environ.get('STORAGE_MYSQL_HOST'),
-        user=os.environ.get('STORAGE_MYSQL_USER'),
-        password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
-        db=os.environ.get('STORAGE_MYSQL_DB')
-    )
+class MysqlOperations:
 
-    if not isinstance(data, pd.DataFrame):
-        raise ValueError('data argument must be a dataframe')
+    def __init__(self):
+        pass
 
-    if not isinstance(store_rows, int) or store_rows > 0:
-        raise ValueError('Store_rows arg must be negative number')
+    def connect(self) -> None:
+        """
+        connects to mysql database
+        """
+        # Connect to the database
+        self.connection = pymysql.connect(
+            host=os.environ.get('STORAGE_MYSQL_HOST'),
+            user=os.environ.get('STORAGE_MYSQL_USER'),
+            password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
+            db=os.environ.get('STORAGE_MYSQL_DB')
+        )
 
-    if not isinstance(pair, str) or pair == None:
-        raise ValueError('pair arg must be a String')
+        self.cursor = self.connection.cursor()
 
-    if not isinstance(clear_tables, bool):
-         raise ValueError('clear table arg must be boolean')
-
-    # print('store data', f'{pair}-> {data.iloc[store_rows:]}')
-    # Store the dataframe in MySQL
-    trimed_data = data[store_rows:]
-    # print(trimed_data)
-
-    # print(constants.CLOSE.capitalize())
-
-    # clear table if it is marked for deletion
-    if clear_tables == True:
-        queryX = f"""DROP TABLE {pair} """
-
-        try:
-            with connection.cursor() as cursor:
-                    cursor.execute(queryX),
-        except Exception as e:
-         logging.error(f'DELETING TABLE ERROR occured: ==> {e}')
-
-        logging.info('table deleted')
-
-    query = f"""CREATE TABLE IF NOT EXISTS {pair} (
-            {constants.DATETIME} DATETIME PRIMARY KEY,
-            {constants.OPEN} FLOAT,
-            {constants.HIGH} FLOAT,
-            {constants.LOW} FLOAT,
-            {constants.CLOSE} FLOAT,
-            {constants.VOLUME} FLOAT
-            );"""
-
-    try:
-        with connection.cursor() as cursor:
-                cursor.execute(query),
-    except Exception as e:
-        logging.error('creating TABLE error has occured: ==', e)
+    def is_connected(self) -> bool:
+        """
+        Confirm status of connection
+        """
+        if self.connection:
+            return True
         return False
-
-    for item in trimed_data.index:
-        # print("trimmed_data", item)
-        # print(trimed_data[constants.DATETIME][item])
-        # print(trimed_data.index[0])
+    
+    def disconnect(self):
+        """
+        close database connection
+        """
+        self.cursor.close()
+        self.connection.close()
+    
+    def table_exists(self, table_name) -> bool:
+        """
+        check if a table exists in the database
+        """
         try:
-            db_query = f"""REPLACE INTO {pair} (
+            self.cursor.execute("SHOW TABLES")
+            tables = self.cursor.fetchall()
+
+            exists = table_name in [row[0] for row in tables]
+
+            return exists
+        
+        except pymysql.Error as e:
+                raise ValueError("Error connecting to MySQL:", e)
+
+    def __create_table(self, pair) -> None:
+        """
+        creates a database table for curency pair
+        if it doesn't already exist
+
+        args: 
+            pair: currency pair or instrument
+        
+        throws:
+            valueErrr if operation fails
+        """
+        # create data table if not exist
+        create_query = f"""CREATE TABLE IF NOT EXISTS {pair} (
+                {constants.DATETIME} DATETIME PRIMARY KEY,
+                {constants.OPEN} FLOAT,
+                {constants.HIGH} FLOAT,
+                {constants.LOW} FLOAT,
+                {constants.CLOSE} FLOAT,
+                {constants.VOLUME} FLOAT
+                );"""
+        
+        # Create a cursor object to execute the CREATE TABLE statement
+        
+        try:
+            self.cursor.execute(create_query)
+        except Exception as err:
+            raise ValueError("Error while creating table {pair}=> {er}")
+
+    def store_data(self, data:pd.DataFrame, pair:str) -> None:
+        """
+        receive map of currency prices data and store in database.
+        with ohlcv data
+
+        args:
+            data: dataframe of price of the currency pair trim before sending
+                all data in dataframe will be stored in db
+            pair: currency pair or instrument eg EURUSD_h1
+        returns: None
+        """
+        if not self.is_connected:
+            raise ValueError("db is not connected")
+        
+        self.__create_table(pair)
+
+       
+
+        for item in data.index:
+
+            add_query = f"""REPLACE INTO {pair} (
                 {constants.DATETIME},{constants.OPEN},
                 {constants.HIGH},{constants.LOW},
                 {constants.CLOSE}, {constants.VOLUME})
-                VALUES ('{item}', {trimed_data[constants.OPEN][item]},
-                {trimed_data[constants.HIGH][item]},
-                {trimed_data[constants.LOW][item]}, 
-                {trimed_data[constants.CLOSE][item]},
-                {trimed_data[constants.VOLUME][item]
-                 if constants.VOLUME in trimed_data.columns else 0});
+                VALUES ('{item}', {data[constants.OPEN][item]},
+                {data[constants.HIGH][item]},
+                {data[constants.LOW][item]}, 
+                {data[constants.CLOSE][item]},
+                {data[constants.VOLUME][item]
+                if constants.VOLUME in data.columns else 0});
                 """
-            with connection.cursor() as cursor:
-                cursor.execute(db_query)
-                connection.commit()
-        except Exception as e:
-             logging.error(f'error loading file => {pair}', e)
+             
+            try:
+                self.cursor.execute(add_query)
+                self.connection.commit()
+            except Exception as e:
+                raise ValueError(f'error loading file => {pair}: {e}')
+    
+    def delete_table(self, table_name:str) -> None:
+        """ 
+        delete a database table
 
-    connection.close()
+        args:
+            table_name: name of table to be emtied
+        """
+        queryX = f"""DROP TABLE {table_name} """
+
+        try:
+            self.cursor.execute(queryX),
+        except Exception as e:
+            raise ValueError(f'DELETING TABLE ERROR occured: ==> {e}')
