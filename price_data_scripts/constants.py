@@ -110,6 +110,10 @@ D1 = 'D1'
 W1 = 'W1'
 M1 = 'M1'
 
+LEVEL = 'Level'
+FREQUENCY = 'Frequency'
+ISSUPPORT = 'is_support'
+
 MESSAGE_TITLE = """PRICE ALERT {pair} on {tf}"""
 MESSAGE_BODY = """
 Hi,

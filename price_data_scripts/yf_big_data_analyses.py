@@ -9,12 +9,13 @@ import os
 import constants
 from data_source.yf import fetch_yf
 from db_storage_service import MysqlOperations
+from data_source.sr_collector import SRCollector
 
 def store_sr():
     """
     find key support and resistance and stor in database
     """
-    
+
 
 def request_big_data() -> pd.DataFrame:
     """
@@ -26,6 +27,7 @@ def request_big_data() -> pd.DataFrame:
 
     my_db = MysqlOperations()
     my_db.connect()
+    sr_collector = SRCollector(scan_window=12)
 
     for pair in constants.YF_TICKERS:
 
@@ -41,14 +43,18 @@ def request_big_data() -> pd.DataFrame:
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
             continue
+        break
 
-        print(response.head(10))
-        print(response.tail(10))
+    print(response.head(10))
+    print(response.tail(10))
 
-        try:
-            my_db.store_data(response, big_pair)
-        except Exception as ex:
-            logging.error(f"{pair} {ex}")
+    # try:
+    #     my_db.store_data(response, big_pair)
+    # except Exception as ex:
+    #     logging.error(f"{pair} {ex}")
+    
+    sr_collector.find_sr(response)
+
 
 def update_data():
     """update data table for currency pairs"""
