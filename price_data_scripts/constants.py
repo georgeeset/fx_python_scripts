@@ -28,7 +28,6 @@ DERIV_TICKERS = [
     {'id': 'JD100', 'table':'Jump_100_Index'},
 ]
 
-
 """ forex ticker list for yf query
 """
 YF_TICKERS =   [  
@@ -46,6 +45,22 @@ YF_TICKERS =   [
     'USDHKD=X',
     'EURGBP=X',
     ]
+
+VANTAGE_FX_TICKERS = [
+    'EURUSD',
+    'AUDJPY',
+    'EURCHF',
+    'EURJPY',
+    'USDJPY',
+    'GBPUSD',
+    'AUDUSD',
+    'USDCAD',
+    'USDCHF',
+    'CADCHF',
+    'CHFJPY',
+    'USDHKD',
+    'EURGBP',
+]
 
 CRYPTO_TICKERS = [
     'ETHUSDT',

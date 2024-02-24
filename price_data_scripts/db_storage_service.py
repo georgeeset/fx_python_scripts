@@ -82,11 +82,11 @@ class MysqlOperations:
         try:
             self.cursor.execute(create_query)
         except Exception as err:
-            raise ValueError("Error while creating table {pair}=> {er}")
+            raise ValueError("Error while creating table {pair}=> ", err)
 
     def store_data(self, data:pd.DataFrame, pair:str) -> None:
         """
-        receive map of currency prices data and store in database.
+        receive dataframe of currency prices data and store in database.
         with ohlcv data
 
         args:
@@ -121,6 +121,50 @@ class MysqlOperations:
                 self.connection.commit()
             except Exception as e:
                 raise ValueError(f'error loading file => {pair}: {e}')
+
+
+    def __create_sr_table(self, table_name):
+        """
+        create mysql database if it doesn't exist
+        """
+        create_query = f"""CREATE TABLE IF NOT EXISTS {table_name} (
+                {constants.DATETIME} DATETIME PRIMARY KEY,
+                {constants.LEVEL} FLOAT,
+                {constants.ISSUPPORT} BOOLEAN
+                );"""
+        
+        try:
+            self.cursor.execute(create_query)
+        except Exception as err:
+            raise ValueError("Error while creating table {table_name}=>", err)
+
+
+    def store_sr(self, data: pd.DataFrame, table_name:str):
+        """
+        store key support/ resistance levels 
+        """
+        if not self.is_connected:
+            raise ValueError("Database not connected")
+        
+        self.__create_sr_table(table_name=table_name)
+
+        print(data)
+
+        for item in data.index:
+
+            add_query = f"""REPLACE INTO {table_name} (
+                {constants.DATETIME},{constants.LEVEL},
+                {constants.ISSUPPORT})
+                VALUES ('{item}', {data[constants.LEVEL][item]},
+                {data[constants.ISSUPPORT][item]});
+                """
+             
+            try:
+                self.cursor.execute(add_query)
+                self.connection.commit()
+            except Exception as e:
+                raise ValueError(f'error loading file => {table_name}: {e}')
+
     
     def delete_table(self, table_name:str) -> None:
         """ 
@@ -135,3 +179,37 @@ class MysqlOperations:
             self.cursor.execute(queryX),
         except Exception as e:
             raise ValueError(f'DELETING TABLE ERROR occured: ==> {e}')
+
+    def get_recent_price(self, table_name:str, number:int) -> pd.DataFrame:
+        """
+        query data for latest historical data
+
+        args:
+            table_name: database table name
+            number: number of rows requested
+        """
+
+        price_query = f"""
+        SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}, {constants.VOLUME}
+        FROM {table_name}
+        ORDER BY {constants.DATETIME} ASC
+        LIMIT {number};
+        """
+        try:
+            self.cursor.execute(query=price_query)
+            data = self.cursor.fetchall()
+        except Exception as e:
+           raise ValueError(f"Query Error {table_name} =>", e)
+        if not data:
+            raise ValueError("no daata found on Table for ", table_name)
+
+        df_result = pd.DataFrame(data, columns=[
+            constants.DATETIME,
+            constants.OPEN,
+            constants.HIGH,
+            constants.LOW,
+            constants.CLOSE
+            ])
+        df_result.set_index(constants.DATETIME, inplace=True)
+        return df_result
+        

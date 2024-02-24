@@ -26,21 +26,24 @@ class BinanceData:
 
         Args:
             ticker: currency pair
-            timeframe: chart timeframe. eg; h1, h4, d1
+            timeframe: chart timeframe. eg; 1h, 4h, 1d ...
             limit: number of historical candles to request
 
         Returns: pandas dataframe
 
         Throws: ConnectionError
         """
-        response = self.client.klines(ticker, timeframe, limit=limit)
+        try:
+            response = self.client.klines(symbol=ticker, interval=timeframe, limit=limit)
+        except Exception as ex:
+            raise ValueError("Failed to download from server: ", ex)
 
         if response is None:
             raise ConnectionError("unable to get data for ticker {}".format(ticker))
 
         data = self._convert_data(response)
         return data
-
+    
     def _convert_data(self, payload:list) -> pd.DataFrame:
         """
         Clean up payload message and return ohlcv dataframe

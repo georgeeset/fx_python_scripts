@@ -9,7 +9,7 @@ import pandas as pd
 import constants
 from datetime import datetime
 from binance.spot import Spot
-from db_storage_service import store_in_db
+from db_storage_service import MysqlOperations
 from alert_query_service import alert_query_manager
 from more_data import tf_query_manager, measured_time
 from data_source.binance import BinanceData

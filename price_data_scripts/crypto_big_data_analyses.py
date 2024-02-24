@@ -3,14 +3,15 @@ module used to download daily data from their api and store in database,
 analize the data and store key support and resistance levels in database.
 recommended to run every 10-15 days
 """
-import pandas as pd
 import logging
-import os
 import constants
-from data_source.yf import fetch_yf
+import pandas as pd
+import os
+
 from db_storage_service import MysqlOperations
 from data_source.sr_collector import SRCollector
-from data_source.alpha_vantage import AlphaVantage
+from data_source.binance import BinanceData
+
 
 def request_big_data() -> pd.DataFrame:
     """
@@ -19,37 +20,49 @@ def request_big_data() -> pd.DataFrame:
     """
     interval = '1d'
     period = None
+    my_scan_window = 12 # sr scan window for analyses
 
     my_db = MysqlOperations()
     my_db.connect()
-    sr_collector = SRCollector(scan_window=12)
-    fx = AlphaVantage()
+    sr_collector = SRCollector(scan_window=my_scan_window)
+    data_source = BinanceData()
 
-    for pair in constants.VANTAGE_FX_TICKERS:
+    for pair in constants.CRYPTO_TICKERS:
 
-        big_pair = pair[:-2]+'_big' # format text to suit table format
-        all = False
+        big_pair = pair+'_big' # format text to suit table format
+        candles = 0
+        response = pd.DataFrame()   # empty dataframe
         if not my_db.table_exists(big_pair):
             logging.warning(f"table {big_pair} is new table")
-            all = True
+            candles = 550
         else:
-            all = False
+            candles = 20
 
-        response = fx.fx_daily(pair, all)
+        try:
+            response = data_source.fetch_candles(pair, '1d', candles )
+        except Exception as e:
+            logging.error(f"Failed to collect data {pair}", e)
+
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
             continue
 
-        print(response.head(10))
-        print(response.tail(10))
+        # print(response.head(10))
+        # print(response.tail(10))
 
         try:
             my_db.store_data(response, big_pair)
         except Exception as ex:
             logging.error(f"{pair} {ex}")
+            continue
 
-        sr_df = sr_collector.find_sr(response)
-        my_db.store_sr(sr_df, pair+'_sr')   # add data received to database
+        if len(response) > my_scan_window:
+            sr_df = sr_collector.find_sr(response)
+        else:
+            data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
+            sr_df = sr_collector.find_sr(data)
+
+        my_db.store_sr(sr_df, big_pair)   # add data received to database
 
 if __name__ == "__main__":
 

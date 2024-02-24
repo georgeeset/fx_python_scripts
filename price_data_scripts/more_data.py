@@ -11,7 +11,7 @@ import os
 import logging
 from datetime import datetime, timedelta
 
-from db_storage_service import store_in_db
+from db_storage_service import MysqlOperations
 
 def monthdelta(date, delta):
     m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
