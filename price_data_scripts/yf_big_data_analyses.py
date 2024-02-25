@@ -3,6 +3,7 @@ module used to download daily data from their api and store in database,
 analize the data and store key support and resistance levels in database.
 recommended to run every 10-15 days
 """
+from datetime import datetime, timedelta
 import pandas as pd
 import logging
 import os
@@ -18,8 +19,6 @@ def request_big_data() -> pd.DataFrame:
     Get data from cloud to database.
     2 years daily data or 1 month daily data
     """
-    interval = '1d'
-    period = None
     my_scan_window = 12 # sr scan window for analyses
 
     my_db = MysqlOperations()
@@ -30,6 +29,7 @@ def request_big_data() -> pd.DataFrame:
 
         big_pair = pair+'_'+constants.D1 # format text to suit table format
         all = False
+        response = pd.DataFrame()
         if not my_db.table_exists(big_pair):
             logging.warning(f"table {big_pair} is new table")
             all = True
@@ -39,7 +39,8 @@ def request_big_data() -> pd.DataFrame:
             response = fx.fx_daily(pair, all)
         except Exception as e:
             logging.error(f"data downloading failed {big_pair}: {e}")
-
+            continue
+        
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
             continue
@@ -64,6 +65,11 @@ def request_big_data() -> pd.DataFrame:
         else:
             logging.error(f"No support/Resistance found: {pair}")
             print(f"nothing found on support/resistance: {pair}")
+
+        # delete old data from support/resistance history
+        my_db.delete_old_data(table_name=pair+'_sr', years=2)
+
+    my_db.disconnect()
 
 if __name__ == "__main__":
 

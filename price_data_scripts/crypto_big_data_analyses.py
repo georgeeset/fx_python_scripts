@@ -70,6 +70,11 @@ def request_big_data(argv) -> pd.DataFrame:
             logging.info(f"No support/Resistance found: {big_pair}")
             # print(f"nothing found on support/resistance: {big_pair}")
 
+        # delete old data from support/resistance history
+        my_db.delete_old_data(table_name=pair+'_sr', years=2)
+
+    my_db.disconnect()
+
 if __name__ == "__main__":
 
     # Get the script's absolute path

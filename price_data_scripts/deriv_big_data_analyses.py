@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import sys
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from db_storage_service import MysqlOperations
 from data_source.sr_collector import SRCollector
 from data_source.deriv import DerivManager
@@ -36,47 +36,52 @@ async def request_big_data() -> pd.DataFrame:
 
     for pair in constants.DERIV_TICKERS:
 
-        big_pair = pair[constants.TABLE]+'_'+constants.D1 # table name
+        tbl_name = pair[constants.TABLE]+'_'+constants.D1 # table name
         big_id= pair[constants.ID]   # id for fetching data from api
         candles = 0
         response = pd.DataFrame()   # empty dataframe
-        if not my_db.table_exists(big_pair) :
-            logging.warning(f"table {big_pair} is new table")
+        if not my_db.table_exists(tbl_name) :
+            logging.warning(f"table {tbl_name} is new table")
             candles = 550
         else:
             candles = my_scan_window
 
-        print(f'getting data for {big_pair}')
+        print(f'getting data for {tbl_name}')
         try:
             response = await data_source.fetch_candles(pair=big_id, frame=interval,
                                                  size = candles, end_time=epoch_time
                                                  )
         except Exception as e:
-            logging.error(f"Failed to collect data {big_pair}: {e}")
+            logging.error(f"Failed to collect data {tbl_name}: {e}")
 
         if response.empty:
-            logging.error("Failed to fetch big data {}".format(big_pair))
+            logging.error("Failed to fetch big data {}".format(tbl_name))
             continue
 
         try:
-            my_db.store_data(response, big_pair)
+            my_db.store_data(response, tbl_name)
         except Exception as ex:
-            logging.error(f"{big_pair} {ex}")
+            logging.error(f"{tbl_name} {ex}")
             continue
 
-        print(f'finding sr points for {big_pair}')
+        print(f'finding sr points for {tbl_name}')
         if len(response) > my_scan_window:
             sr_df = sr_collector.find_sr(response)
         else:
-            data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
+            data = my_db.get_recent_price(tbl_name, round(my_scan_window + (my_scan_window/2)))
             sr_df = sr_collector.find_sr(data)
 
         if not sr_df.empty:
             my_db.store_sr(sr_df, pair[constants.TABLE])   # add data received to database
         else:
-            logging.info(f"No support/Resistance found: {big_pair}")
+            logging.info(f"No support/Resistance found: {tbl_name}")
             # print(f"nothing found on support/resistance: {big_pair}")
+
+        # delete old data from support/resistance history
+        my_db.delete_old_data(table_name=pair[constants.TABLE]+'_sr', years=2)
+
     await data_source.disconnect()
+    my_db.disconnect()
 
 
 if __name__ == "__main__":

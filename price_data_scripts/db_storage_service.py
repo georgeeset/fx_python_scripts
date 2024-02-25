@@ -1,5 +1,6 @@
 """receive process and store data from Deriv"""
 
+from datetime import datetime
 import pandas as pd
 import pymysql
 import constants
@@ -217,4 +218,22 @@ class MysqlOperations:
             ])
         df_result.set_index(constants.DATETIME, inplace=True)
         return df_result
+        
+    def delete_old_data(self, table_name: pd.DataFrame, years:int):
+        """
+        delete old data from datatable.
+        deletes data older than the given datetime
+        
+        args:
+            table_name: name of table to be cleaned
+            older_than: data older than this date will be deleted
+        """
+        delete_query = f"""DELETE FROM {table_name}
+                        WHERE {constants.DATETIME} < DATE_SUB(NOW(), INTERVAL {years} YEAR);"""
+        
+        try:
+            self.cursor.execute(delete_query)
+            self.connection.commit()
+        except Exception as e:
+            raise ValueError(f"Deletion QueryError {table_name}: {e}")
         

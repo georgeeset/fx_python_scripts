@@ -7,7 +7,7 @@ import pandas as pd
 import constants
 import asyncio
 from datetime import datetime
-from db_storage_service import store_in_db
+from db_storage_service import MysqlOperations
 from alert_query_service import alert_query_manager
 from more_data import tf_query_manager, measured_time
 from data_source.yf import fetch_yf
@@ -18,6 +18,7 @@ async def get_yf_data():
     
     query_async_tasks = []
     now = datetime.now()
+    my_sql_operations = MysqlOperations()
 
     for item in constants.YF_TICKERS:
         data = fetch_yf(item, period='1d', interval='60m' )
@@ -29,7 +30,7 @@ async def get_yf_data():
 
         current_pair = f'{item[:-2]}_h1'
 
-        store_in_db(data, pair=current_pair)
+        my_sql_operations.store_data(data, pair=current_pair)
 
         # QUERY db to get h4 d1 w1 and m1 data
         # then store in separate tables using store_in_db function
