@@ -8,7 +8,7 @@ import constants
 import logging
 import os
 import pandas as pd
-from db_storage_service import store_in_db
+from db_storage_service import MysqlOperations
 from alert_query_service import alert_query_manager
 from more_data import tf_query_manager, measured_time
 from data_source.deriv import DerivManager
@@ -26,6 +26,8 @@ async def connect_attempt() -> None:
     now = datetime.now()
     epoch_time = int(now.timestamp())
     # print(epoch_time)
+
+    my_sql_operations = MysqlOperations()
 
     chart_type = "candles"
     granularity = 3600 #seconds = 1 hour
@@ -57,9 +59,8 @@ async def connect_attempt() -> None:
                 # candles_data = make_dataframe(candles)
                 current_pair = f'{value[constants.TABLE]}_h1'
 
-                store_in_db(data=candles,
-                            pair=current_pair,
-                            store_rows=-1,
+                my_sql_operations.store_data(data=candles.iloc[-2:],
+                            pair=current_pair
                             )
 
                 # QUERY db to get h4 d1 w1 and m1 data
@@ -91,7 +92,7 @@ async def connect_attempt() -> None:
     await asyncio.gather(*query_async_tasks)
 
     # disconnect when done
-    await deriv_data.disconnect();
+    await deriv_data.disconnect()
 
 async def task_function() -> None:
     """
@@ -114,6 +115,7 @@ async def task_function() -> None:
         # Task completed successfully (can do cleanup here)
         pass
 
+
 if __name__  == "__main__":
     # Get the script's absolute path
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -126,8 +128,6 @@ if __name__  == "__main__":
     datefmt='%Y-%m-%d %H:%M:%S',
     force = True
     )
-
-    logging.warning("first attempt to run file")
 
     asyncio.run(task_function())
 

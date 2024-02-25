@@ -37,7 +37,6 @@ class DerivManager:
         """
         Connects to the Deriv API.
         """
-
         self.api = DerivAPI(app_id = 1234)
 
     async def fetch_candles(self, pair: str, frame: str, size: int, end_time: str) -> pd.DataFrame:

@@ -31,10 +31,12 @@ class SRCollector:
             point=self.__is_sr(data.iloc[row:row+length])
             if point:
                 compiled.append(point)
-        compiled_df = pd.DataFrame(compiled)
-        compiled_df.set_index(constants.DATETIME, inplace=True)
-        print(compiled_df)
-        return compiled_df
+
+        if len(compiled) > 0:
+            compiled_df = pd.DataFrame(compiled)
+            compiled_df.set_index(constants.DATETIME, inplace=True)
+            return compiled_df
+        return pd.DataFrame()
 
     def __is_sr (self, data) -> map:
         """
@@ -60,7 +62,7 @@ class SRCollector:
                           constants.ISSUPPORT: False,
                           constants.DATETIME: df.index[center]
                           }
-            print(data_found)
+            # print(data_found)
             return data_found
         
         elif(lowestLow==df.iloc[center][constants.CLOSE]):
@@ -69,9 +71,7 @@ class SRCollector:
                           constants.ISSUPPORT: True,
                           constants.DATETIME: df.index[center]
                           }
-            print(data_found)
+            # print(data_found)
             return data_found
         else:
             return None
-
-

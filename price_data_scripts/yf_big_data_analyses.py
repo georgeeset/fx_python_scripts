@@ -7,6 +7,7 @@ import pandas as pd
 import logging
 import os
 import constants
+
 from data_source.yf import fetch_yf
 from db_storage_service import MysqlOperations
 from data_source.sr_collector import SRCollector
@@ -19,37 +20,50 @@ def request_big_data() -> pd.DataFrame:
     """
     interval = '1d'
     period = None
+    my_scan_window = 12 # sr scan window for analyses
 
     my_db = MysqlOperations()
-    my_db.connect()
     sr_collector = SRCollector(scan_window=12)
     fx = AlphaVantage()
 
     for pair in constants.VANTAGE_FX_TICKERS:
 
-        big_pair = pair[:-2]+'_big' # format text to suit table format
+        big_pair = pair+'_'+constants.D1 # format text to suit table format
         all = False
         if not my_db.table_exists(big_pair):
             logging.warning(f"table {big_pair} is new table")
             all = True
-        else:
-            all = False
 
-        response = fx.fx_daily(pair, all)
+        print(f'getting data for {big_pair}')
+        try:
+            response = fx.fx_daily(pair, all)
+        except Exception as e:
+            logging.error(f"data downloading failed {big_pair}: {e}")
+
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
             continue
-
-        print(response.head(10))
-        print(response.tail(10))
 
         try:
             my_db.store_data(response, big_pair)
         except Exception as ex:
             logging.error(f"{pair} {ex}")
+            continue
 
-        sr_df = sr_collector.find_sr(response)
-        my_db.store_sr(sr_df, pair+'_sr')   # add data received to database
+        print(f'finding sr points for {big_pair}')
+        if all:
+            sr_df = sr_collector.find_sr(response)
+            print(len(response))
+        else:
+            data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
+            print(data)
+            sr_df = sr_collector.find_sr(data)
+
+        if not sr_df.empty:
+            my_db.store_sr(sr_df, pair)   # add data received to database
+        else:
+            logging.error(f"No support/Resistance found: {pair}")
+            print(f"nothing found on support/resistance: {pair}")
 
 if __name__ == "__main__":
 
@@ -66,3 +80,5 @@ if __name__ == "__main__":
     )
 
     request_big_data()
+
+exit()

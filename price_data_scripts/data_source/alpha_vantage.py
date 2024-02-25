@@ -36,11 +36,14 @@ class AlphaVantage:
         return data
 
     def fx_daily(self, symbol:str, all:bool=False) -> pd.DataFrame:
+        """
+        download daily candlestick from api
+        """
         if(self.__api_call_count >= self.__api_limit):
             self.__wait_api()
         
         try:
-            data = self.ts.get_daily(symbol=symbol, outputsize='all' if all else 'compact')[0]
+            data = self.ts.get_daily(symbol=symbol, outputsize='full' if all else 'compact')[0]
         except Exception as ex:
             raise ValueError("data download railed: ", ex)
         if not data.any:

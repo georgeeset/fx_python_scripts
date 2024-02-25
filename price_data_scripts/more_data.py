@@ -48,6 +48,7 @@ def tf_query_manager(source_table:str):
 
     now_datetime = datetime.now()
 
+
     target_time = None
    
     if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
@@ -85,6 +86,8 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
             target_time:
     """
 
+    my_sql_operations = MysqlOperations()
+    
     # Connect to the database
     connection = pymysql.connect(
         host=os.environ.get('STORAGE_MYSQL_HOST'),
@@ -151,7 +154,7 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
     #     print (i)
 
     # print(type(new_data))
-    store_in_db(data=new_data,
+    my_sql_operations.store_data(data=new_data,
                 pair=new_table
                 )
 

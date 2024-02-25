@@ -22,6 +22,7 @@ async def crypto_data_service():
     binance_data = BinanceData()
     query_async_tasks = []
     now = datetime.now()
+    mysql_operations = MysqlOperations()
 
     for ticker in constants.CRYPTO_TICKERS:
         current_pair = f'{ticker}_h1'
@@ -33,7 +34,7 @@ async def crypto_data_service():
             continue
         else:
             # candles_data = data_handler(response)
-            store_in_db(candles_data, current_pair, -1, False)
+            mysql_operations.store_data(candles_data.iloc[-2:], current_pair, -1, False)
 
             # QUERY db to get h4 d1 w1 and m1 data
             # then store in separate tables using store_in_db function

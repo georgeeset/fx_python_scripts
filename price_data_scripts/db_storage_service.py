@@ -10,9 +10,6 @@ import logging
 class MysqlOperations:
 
     def __init__(self):
-        pass
-
-    def connect(self) -> None:
         """
         connects to mysql database
         """
@@ -25,7 +22,7 @@ class MysqlOperations:
         )
 
         self.cursor = self.connection.cursor()
-
+        
     def is_connected(self) -> bool:
         """
         Confirm status of connection
@@ -43,7 +40,13 @@ class MysqlOperations:
     
     def table_exists(self, table_name) -> bool:
         """
-        check if a table exists in the database
+        check if a table exists in the database]
+        
+        args:
+            table_name: name of table to find
+        
+        returns: True if table exists and False otherwise
+
         """
         try:
             self.cursor.execute("SHOW TABLES")
@@ -143,16 +146,17 @@ class MysqlOperations:
         """
         store key support/ resistance levels 
         """
+        sr_table = table_name+'_sr'
         if not self.is_connected:
             raise ValueError("Database not connected")
         
-        self.__create_sr_table(table_name=table_name)
+        self.__create_sr_table(table_name=sr_table)
 
-        print(data)
+        # print(data)
 
         for item in data.index:
 
-            add_query = f"""REPLACE INTO {table_name} (
+            add_query = f"""REPLACE INTO {sr_table} (
                 {constants.DATETIME},{constants.LEVEL},
                 {constants.ISSUPPORT})
                 VALUES ('{item}', {data[constants.LEVEL][item]},
@@ -163,9 +167,9 @@ class MysqlOperations:
                 self.cursor.execute(add_query)
                 self.connection.commit()
             except Exception as e:
-                raise ValueError(f'error loading file => {table_name}: {e}')
+                raise ValueError(f'error loading file => {sr_table}: {e}')
 
-    
+
     def delete_table(self, table_name:str) -> None:
         """ 
         delete a database table
@@ -208,7 +212,8 @@ class MysqlOperations:
             constants.OPEN,
             constants.HIGH,
             constants.LOW,
-            constants.CLOSE
+            constants.CLOSE,
+            constants.VOLUME
             ])
         df_result.set_index(constants.DATETIME, inplace=True)
         return df_result
