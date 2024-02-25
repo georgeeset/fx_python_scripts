@@ -197,7 +197,7 @@ class MysqlOperations:
         price_query = f"""
         SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}, {constants.VOLUME}
         FROM {table_name}
-        ORDER BY {constants.DATETIME} ASC
+        ORDER BY {constants.DATETIME} DESC
         LIMIT {number};
         """
         try:
@@ -217,7 +217,7 @@ class MysqlOperations:
             constants.VOLUME
             ])
         df_result.set_index(constants.DATETIME, inplace=True)
-        return df_result
+        return df_result[::-1] # reverse the dataframe to stand upright
         
     def delete_old_data(self, table_name: pd.DataFrame, years:int):
         """

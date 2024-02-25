@@ -11,3 +11,6 @@ price_dadta_scripts/logs/*
 
 # config file
 launcher.sh
+
+# pycache
+__pycache__

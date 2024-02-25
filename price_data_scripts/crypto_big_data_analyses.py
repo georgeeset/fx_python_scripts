@@ -12,6 +12,7 @@ import sys
 from db_storage_service import MysqlOperations
 from data_source.sr_collector import SRCollector
 from data_source.binance import BinanceData
+from pattern_detector import PatternDetector
 
 
 def request_big_data(argv) -> pd.DataFrame:
@@ -26,6 +27,7 @@ def request_big_data(argv) -> pd.DataFrame:
     my_db = MysqlOperations()
     sr_collector = SRCollector(scan_window=my_scan_window)
     data_source = BinanceData()
+    pattern_detector = PatternDetector()
 
     for arg in argv:
         print(arg)
@@ -49,6 +51,7 @@ def request_big_data(argv) -> pd.DataFrame:
 
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
+            print('data download failed')
             continue
 
         try:
@@ -60,9 +63,11 @@ def request_big_data(argv) -> pd.DataFrame:
         print(f'finding sr points for {big_pair}')
         if len(response) > my_scan_window:
             sr_df = sr_collector.find_sr(response)
+            pattern_detector.check_patterns(response.iloc[:-12])
         else:
             data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
             sr_df = sr_collector.find_sr(data)
+            pattern_detector.check_patterns(data)
 
         if not sr_df.empty:
             my_db.store_sr(sr_df, pair)   # add data received to database
@@ -70,6 +75,7 @@ def request_big_data(argv) -> pd.DataFrame:
             logging.info(f"No support/Resistance found: {big_pair}")
             # print(f"nothing found on support/resistance: {big_pair}")
 
+        
         # delete old data from support/resistance history
         my_db.delete_old_data(table_name=pair+'_sr', years=2)
 

@@ -102,7 +102,7 @@ class DerivManager:
 
         # Fill data into dataframe
         for candle in candles.get(constants.CANDLES):
-            dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH)))
+            dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH))) # add timezone if you wish
             dict_data[constants.OPEN].append(candle.get(constants.OPEN.lower()))
             dict_data[constants.HIGH].append(candle.get(constants.HIGH.lower()))
             dict_data[constants.LOW].append(candle.get(constants.LOW.lower()))

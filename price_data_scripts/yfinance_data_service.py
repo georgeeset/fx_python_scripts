@@ -62,13 +62,14 @@ async def get_yf_data():
 
 if __name__ == '__main__':
 
-    # Exit if weekend
+    # Exit if weekend 
     week_num = datetime.today().weekday()
     current_hour = datetime.now().hour
-    if week_num > 4:
+    if week_num > 4 and current_hour > 0:
         exit()
 
-    if week_num == 0 and current_hour == 0:
+    # monday morning, 1AM
+    if week_num == 0 and current_hour == 0: 
         print("wait for one more hour")
         exit()
 

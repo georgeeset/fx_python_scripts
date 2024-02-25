@@ -125,6 +125,15 @@ D1 = 'D1'
 W1 = 'W1'
 M1 = 'M1'
 
+# Approved candlestick chart patterns
+APPROVED_PATTERNS = ['engulfing', 'morningstar', 'morningdojistar', '3blackcrows',
+                     'abandonedbaby',  'dojistar', 'dragonflydoji', 'eveningdojistar',
+                     'gravestonedoji', 'longleggeddoji', 'morningdojistar', 'kicking',
+                     'kickingbylength', 'hammer', 'invertedhammer', '3whitesoldiers',
+                     'spinningtop', 'piercing', 'darkcloudcover', 'risefall3methods',
+                     'xsidegap3methods', 'shootingstar', 'hangingman', 'harami',
+                     'haramicross', 
+                     ]
 LEVEL = 'Level'
 FREQUENCY = 'Frequency'
 ISSUPPORT = 'is_support'

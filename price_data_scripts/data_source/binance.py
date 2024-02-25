@@ -62,9 +62,8 @@ class BinanceData:
                         'taker_base_vol','taker_quote_vol', 'ignore'
                         ],axis=1,inplace=True)
         price_data.set_index(constants.DATETIME,inplace=True)
-        # due to deriv api hourly agregation, the last row is not a complete hour.
-        if price_data.index[-1].hour == datetime.now().hour:
-            # print(price_data.index[-1])
-            # print("hour is same as current hour")
-            price_data.drop(price_data.index[-1], axis=0, inplace=True)
+
+        # due to deriv api is not a complete timeframe
+        price_data.drop(price_data.index[-1], axis=0, inplace=True)
+
         return price_data
