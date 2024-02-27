@@ -20,9 +20,6 @@ class SRCollector:
                     highest / lowest price
         """
         self.__scan_window = scan_window
-        self.__sr_dataframe = pd.DataFrame(columns=[
-            constants.LEVEL, constants.ISSUPPORT, constants.DATETIME, constants.FREQUENCY
-            ])
 
     def find_sr(self, data:pd.DataFrame) -> pd.DataFrame:
         length=self.__scan_window
@@ -47,31 +44,30 @@ class SRCollector:
 
         returns: map containing value, bool support or not support, datetime
         """
-        df=data.copy()
         center = round(self.__scan_window/2)
 
         # if(len(df)!= (center*2)):
         #     print('Data length does not put center at {c}'.format(c=center))
         #     return None 
-        highestHigh=df[constants.CLOSE].max()
-        lowestLow=df[constants.CLOSE].min()
-        
+        highestHigh=data[constants.CLOSE].max()
+        lowestLow=data[constants.CLOSE].min()
+       
         # find max and appriximate if any
-        if(highestHigh==df.iloc[center][constants.CLOSE]):
+        if(highestHigh==data[constants.CLOSE].iloc[center]):
             data_found = {constants.LEVEL: highestHigh,
                           constants.ISSUPPORT: False,
-                          constants.DATETIME: df.index[center]
+                          constants.DATETIME: data.index[center]
                           }
             # print(data_found)
             return data_found
         
-        elif(lowestLow==df.iloc[center][constants.CLOSE]):
+        elif(lowestLow==data[constants.CLOSE].iloc[center]):
             # print(f'Min found: {lowestLow}')
             data_found = {constants.LEVEL: lowestLow,
                           constants.ISSUPPORT: True,
-                          constants.DATETIME: df.index[center]
+                          constants.DATETIME: data.index[center]
                           }
-            # print(data_found)
+            print(data_found)
             return data_found
         else:
             return None

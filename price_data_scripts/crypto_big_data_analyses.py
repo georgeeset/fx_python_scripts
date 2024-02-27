@@ -34,16 +34,17 @@ def request_big_data(argv) -> pd.DataFrame:
 
     for pair in constants.CRYPTO_TICKERS:
 
-        big_pair = pair+'_'+constants.D1 # format text to suit table format
+        d1_table = pair+'_'+constants.D1 # format text to suit table name
+        sr_table = pair+'_sr' # formated to sr table name
         candles = 0
         response = pd.DataFrame()   # empty dataframe
-        if not my_db.table_exists(big_pair) :
-            logging.warning(f"table {big_pair} is new table")
+        if not my_db.table_exists(d1_table) or not my_db.table_exists(sr_table):
+            logging.warning(f"One or more required tables does not exist")
             candles = 550
         else:
             candles = my_scan_window
 
-        print(f'getting data for {big_pair}')
+        print(f'getting data for {d1_table}')
         try:
             response = data_source.fetch_candles(pair, interval, candles )
         except Exception as e:
@@ -55,29 +56,35 @@ def request_big_data(argv) -> pd.DataFrame:
             continue
 
         try:
-            my_db.store_data(response, big_pair)
+            my_db.store_data(response, d1_table)
         except Exception as ex:
-            logging.error(f"{big_pair} {ex}")
+            logging.error(f"{d1_table} {ex}")
             continue
 
-        print(f'finding sr points for {big_pair}')
-        if len(response) > my_scan_window:
-            sr_df = sr_collector.find_sr(response)
-            pattern_detector.check_patterns(response.iloc[:-12])
+        print(f'finding sr points for {d1_table}')
+        if candles > my_scan_window:
+            # sr_df = sr_collector.find_sr(response)
+            data = my_db.get_recent_price(d1_table, candles)
         else:
-            data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
-            sr_df = sr_collector.find_sr(data)
-            pattern_detector.check_patterns(data)
+            data = my_db.get_recent_price(d1_table, round(my_scan_window + (my_scan_window/2)))
+        
+        sr_df = sr_collector.find_sr(data)
+            
 
         if not sr_df.empty:
             my_db.store_sr(sr_df, pair)   # add data received to database
         else:
-            logging.info(f"No support/Resistance found: {big_pair}")
+            logging.info(f"No support/Resistance found: {d1_table}")
             # print(f"nothing found on support/resistance: {big_pair}")
 
+        try:
+            pattern_detector.check_patterns(data, pair)
+        except Exception as e:
+            logging.error(f"pattern detection failed: {e}")
+            print(f"error detecting pattern {e}")
         
         # delete old data from support/resistance history
-        my_db.delete_old_data(table_name=pair+'_sr', years=2)
+        my_db.delete_old_data(table_name=sr_table, years=2)
 
     my_db.disconnect()
 

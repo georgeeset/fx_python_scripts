@@ -42,6 +42,7 @@ class BinanceData:
             raise ConnectionError("unable to get data for ticker {}".format(ticker))
 
         data = self._convert_data(response)
+        # print(type(data[constants.CLOSE].iloc[-1])) # its a fucking string
         return data
     
     def _convert_data(self, payload:list) -> pd.DataFrame:

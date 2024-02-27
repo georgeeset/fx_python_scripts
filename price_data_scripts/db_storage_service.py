@@ -60,13 +60,13 @@ class MysqlOperations:
         except pymysql.Error as e:
                 raise ValueError("Error connecting to MySQL:", e)
 
-    def __create_table(self, pair) -> None:
+    def __create_price_table(self, pair) -> None:
         """
         creates a database table for curency pair
         if it doesn't already exist
 
         args: 
-            pair: currency pair or instrument
+            pair: currency pair or instrument e.g EURUSD_D1
         
         throws:
             valueErrr if operation fails
@@ -85,6 +85,7 @@ class MysqlOperations:
         
         try:
             self.cursor.execute(create_query)
+            self.connection.commit()
         except Exception as err:
             raise ValueError("Error while creating table {pair}=> ", err)
 
@@ -102,7 +103,7 @@ class MysqlOperations:
         if not self.is_connected:
             raise ValueError("db is not connected")
         
-        self.__create_table(pair)
+        self.__create_price_table(pair)
 
        
 
@@ -139,6 +140,7 @@ class MysqlOperations:
         
         try:
             self.cursor.execute(create_query)
+            self.connection.commit()
         except Exception as err:
             raise ValueError("Error while creating table {table_name}=>", err)
 
@@ -170,7 +172,49 @@ class MysqlOperations:
             except Exception as e:
                 raise ValueError(f'error loading file => {sr_table}: {e}')
 
+    def query_sr(self, price:float, pair:str) -> pd.DataFrame:
+        """
+        query support/ resistance database withing a given time range
+        tollerance range is +/-2.3%
 
+        args:
+            price: closing price of the stock
+            pair: currency pair or instrument
+                will be used to make the table name
+        returns:
+            pandas dataframe containing query result or empty dataframe
+        """
+        table_name = pair+'_sr'
+        tollerance = price * 0.053 # 2.3% of price as tollenace range
+        upper_limit = price + tollerance
+        lower_limit = price - tollerance
+
+        #TODO consider using ATR so that price volatility will be included
+         
+        sr_query = f"""SELECT {constants.DATETIME}, {constants.ISSUPPORT}
+                    FROM {table_name}
+                    WHERE {constants.LEVEL} BETWEEN {upper_limit} AND {lower_limit}
+                    ORDER BY {constants.DATETIME} ASC;"""
+        
+        try:
+            self.cursor.execute(sr_query)
+            table = self.cursor.fetchall()
+        except Exception as e:
+            raise ValueError(f'error loading file => {table_name}: {e}')
+        
+        if len(table) < 1:
+            return pd.DataFrame()
+        # print(table)
+    
+        df_result = pd.DataFrame(table, columns=[
+            constants.DATETIME,
+            constants.ISSUPPORT
+            ])
+        df_result.set_index(constants.DATETIME, inplace=True)
+
+        return df_result
+
+    
     def delete_table(self, table_name:str) -> None:
         """ 
         delete a database table

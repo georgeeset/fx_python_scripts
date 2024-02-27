@@ -63,8 +63,8 @@ VANTAGE_FX_TICKERS = [
 ]
 
 CRYPTO_TICKERS = [
-    'ETHUSDT',
-    'BTCUSDT',
+    # 'ETHUSDT',
+    # 'BTCUSDT',
     'SOLUSDT',
     'FTTUSDT',
     'XRPUSDT',
@@ -73,7 +73,7 @@ CRYPTO_TICKERS = [
     'FTTUSDT',
     'AVAXUSDT',
     'TIAUSDT',
-    'AVAXUSDT',
+    'AVAXUSDT'
     ]
 
 KLINE_COLUMN_NAMES= ['open_time','Open',
