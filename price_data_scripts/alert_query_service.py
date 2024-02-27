@@ -202,32 +202,6 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
     
     logging.info(f"======== Query completed for {instrument} ===========")
 
-def time_frame_filter(time_frame) -> bool:
-    """ Determine if the timeframe is eligable to receive alert
-    args:
-        timeframe: string symbol of the timeframe h1, W1,
-    """
-    current_time = datetime.now()
-    good_to_send = False
-
-    if time_frame == constants.H1:
-            good_to_send = True
-    elif time_frame == constants.H4:
-        if current_time.hour % 4 == 0:
-            good_to_send = True
-    elif time_frame == constants.D1:
-        if current_time.hour == 0:
-            good_to_send = True
-    elif time_frame == constants.W1:
-        if current_time.weekday == 0:
-            good_to_send = True
-    elif time_frame == constants.M1:
-        if current_time.day == 1:
-            good_to_send = True
-    
-    return good_to_send
-
-
 async def query_db(connection, query) -> None:
     """Query database with given query command
     based on query ersult.

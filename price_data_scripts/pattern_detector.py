@@ -1,7 +1,6 @@
 """
 module for detecting common candlestick patterns
 """
-import pandas_ta as ta
 import pandas as pd
 import constants
 from db_storage_service import MysqlOperations
@@ -27,8 +26,7 @@ class PatternDetector(MysqlOperations):
         returns: dataframe containing details of pattern detected
                 and price range history 
         """
-        patterns = []
-        details = {}
+
         result = data.ta.cdl_pattern(name = constants.APPROVED_PATTERNS)
         target_value = 0
         target_index = -1
@@ -39,17 +37,24 @@ class PatternDetector(MysqlOperations):
 
         # get column names
         spotted_list = result.columns[mask].to_list()
-        print(patterns)
-        # for item in spotted_list:
-        #     patterns.append({"name":item, "value": result[item].iloc[-1]})
 
-        # send price to get the location
-        self.__query_location(data[constants.CLOSE].iloc[target_index], pair) 
+        observation = self.__query_zone(data[constants.CLOSE].iloc[target_index], pair)
+        print(observation)
+
+        # TODO send patterns list to a query service that checks for alerts on that pattern name
+        # and send to users with user_id and alert_id
     
-    def __query_location(self, price:float, pair) -> map:
+    def __query_zone(self, price:float, pair) -> map:
         """
-        perform a query to database to get repeated
-        sr positions
+        perform a query to get repeated
+        support and resistance around that price zine
         """
-        print(self.query_sr(price, pair))
+        response = self.query_sr(price, pair)
+        if response.empty:
+            return {}
+        print(response)
+        observation = {"frequency": len(response),
+                       "last_used": response.index[-1],
+                       "recent_status": "Support" if response[constants.ISSUPPORT].iloc[-1] == 1 else "Resistance"}
 
+        return observation
