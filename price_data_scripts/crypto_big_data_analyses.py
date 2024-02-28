@@ -49,6 +49,7 @@ def request_big_data(argv) -> pd.DataFrame:
             response = data_source.fetch_candles(pair, interval, candles )
         except Exception as e:
             logging.error(f"Failed to collect data {pair}: {e}")
+            continue
 
         if response.empty:
             logging.error("Failed to fetch big data {}".format(pair))
@@ -77,6 +78,7 @@ def request_big_data(argv) -> pd.DataFrame:
             logging.info(f"No support/Resistance found: {d1_table}")
             # print(f"nothing found on support/resistance: {big_pair}")
 
+        #TODO move the below block to daily activity as it is needed there
         try:
             pattern_detector.check_patterns(data, pair)
         except Exception as e:

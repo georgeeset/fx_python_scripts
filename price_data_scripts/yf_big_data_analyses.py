@@ -13,6 +13,7 @@ from data_source.yf import fetch_yf
 from db_storage_service import MysqlOperations
 from data_source.sr_collector import SRCollector
 from data_source.alpha_vantage import AlphaVantage
+from pattern_detector import PatternDetector
 
 def request_big_data() -> pd.DataFrame:
     """
@@ -24,14 +25,17 @@ def request_big_data() -> pd.DataFrame:
     my_db = MysqlOperations()
     sr_collector = SRCollector(scan_window=12)
     fx = AlphaVantage()
+    pattern_detector =PatternDetector()
 
     for pair in constants.VANTAGE_FX_TICKERS:
 
         big_pair = pair+'_'+constants.D1 # format text to suit table format
         all = False
+        sr_table = pair+'_sr'
+
         response = pd.DataFrame()
-        if not my_db.table_exists(big_pair):
-            logging.warning(f"table {big_pair} is new table")
+        if not my_db.table_exists(big_pair) or not my_db.table_exists(sr_table):
+            logging.warning(f"One or more required tables does not exist")
             all = True
 
         print(f'getting data for {big_pair}')
@@ -53,12 +57,11 @@ def request_big_data() -> pd.DataFrame:
 
         print(f'finding sr points for {big_pair}')
         if all:
-            sr_df = sr_collector.find_sr(response)
-            print(len(response))
+            data = my_db.get_recent_price(big_pair, 500)    #500 candles max for analyses
         else:
             data = my_db.get_recent_price(big_pair, round(my_scan_window + (my_scan_window/2)))
-            print(data)
-            sr_df = sr_collector.find_sr(data)
+        
+        sr_df = sr_collector.find_sr(data)
 
         if not sr_df.empty:
             my_db.store_sr(sr_df, pair)   # add data received to database
@@ -66,6 +69,13 @@ def request_big_data() -> pd.DataFrame:
             logging.error(f"No support/Resistance found: {pair}")
             print(f"nothing found on support/resistance: {pair}")
 
+        #TODO move the below block to daily activity as it is needed there
+        try:
+            pattern_detector.check_patterns(data, pair)
+        except Exception as e:
+            logging.error(f"pattern detection failed: {e}")
+            print(f"error detecting pattern {e}")
+    
         # delete old data from support/resistance history
         my_db.delete_old_data(table_name=pair+'_sr', years=2)
 

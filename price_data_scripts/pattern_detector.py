@@ -1,6 +1,7 @@
 """
 module for detecting common candlestick patterns
 """
+import pandas_ta as ta
 import pandas as pd
 import constants
 from db_storage_service import MysqlOperations
@@ -37,9 +38,12 @@ class PatternDetector(MysqlOperations):
 
         # get column names
         spotted_list = result.columns[mask].to_list()
-
-        observation = self.__query_zone(data[constants.CLOSE].iloc[target_index], pair)
-        print(observation)
+        print(spotted_list)
+        if len(spotted_list) > 0:
+            observation = self.__query_zone(data[constants.CLOSE].iloc[target_index], pair)
+            print(observation)
+        else:
+            print('not repited')
 
         # TODO send patterns list to a query service that checks for alerts on that pattern name
         # and send to users with user_id and alert_id

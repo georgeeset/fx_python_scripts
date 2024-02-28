@@ -67,7 +67,7 @@ class SRCollector:
                           constants.ISSUPPORT: True,
                           constants.DATETIME: data.index[center]
                           }
-            print(data_found)
+            # print(data_found)
             return data_found
         else:
             return None

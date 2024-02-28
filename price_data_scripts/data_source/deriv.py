@@ -77,10 +77,10 @@ class DerivManager:
         if data.get(constants.CANDLES):
             # Convert raw data to a DataFrame
             candles_data = self._make_dataframe(data)
+            candles_data.drop(candles_data.index[-1], axis=0, inplace=True)
             return candles_data
 
         return pd.DataFrame()
-
 
     def _make_dataframe(self, candles: map) -> pd.DataFrame:
         """ Convert map data to pandas Dataframe with
@@ -89,7 +89,7 @@ class DerivManager:
 
         Args:
             candles: ohlc data from candlestick data
-        
+
         Returns: pandas DataFrame
         """
 

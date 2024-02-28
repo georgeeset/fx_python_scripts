@@ -123,9 +123,10 @@ class MysqlOperations:
              
             try:
                 self.cursor.execute(add_query)
-                self.connection.commit()
             except Exception as e:
                 raise ValueError(f'error loading file => {pair}: {e}')
+
+        self.connection.commit()
 
 
     def __create_sr_table(self, table_name):
@@ -168,14 +169,15 @@ class MysqlOperations:
              
             try:
                 self.cursor.execute(add_query)
-                self.connection.commit()
             except Exception as e:
                 raise ValueError(f'error loading file => {sr_table}: {e}')
+        self.connection.commit()
+
 
     def query_sr(self, price:float, pair:str) -> pd.DataFrame:
         """
         query support/ resistance database withing a given time range
-        tollerance range is +/-2.3%
+        tollerance range is +/-.45%
 
         args:
             price: closing price of the stock
@@ -185,22 +187,23 @@ class MysqlOperations:
             pandas dataframe containing query result or empty dataframe
         """
         table_name = pair+'_sr'
-        tollerance = price * 0.053 # 2.3% of price as tollenace range
+        tollerance = price * 0.0028 # .45% of price as tollenace range
         upper_limit = price + tollerance
         lower_limit = price - tollerance
-
+        print(f"upper limit: {upper_limit}\nlower limit: {lower_limit}")
         #TODO consider using ATR so that price volatility will be included
          
         sr_query = f"""SELECT {constants.DATETIME}, {constants.ISSUPPORT}
                     FROM {table_name}
-                    WHERE {constants.LEVEL} BETWEEN {upper_limit} AND {lower_limit}
+                    WHERE {constants.LEVEL} BETWEEN {lower_limit} AND {upper_limit}
                     ORDER BY {constants.DATETIME} ASC;"""
         
         try:
             self.cursor.execute(sr_query)
             table = self.cursor.fetchall()
-        except Exception as e:
-            raise ValueError(f'error loading file => {table_name}: {e}')
+        except pymysql.DatabaseError as err :
+            print(type(err))
+            raise ValueError(f'error loading file => {table_name}: {err}')
         
         if len(table) < 1:
             return pd.DataFrame()
@@ -225,9 +228,11 @@ class MysqlOperations:
         queryX = f"""DROP TABLE {table_name} """
 
         try:
-            self.cursor.execute(queryX),
+            self.cursor.execute(queryX)
+            self.connection.commi()
         except Exception as e:
             raise ValueError(f'DELETING TABLE ERROR occured: ==> {e}')
+
 
     def get_recent_price(self, table_name:str, number:int) -> pd.DataFrame:
         """
@@ -267,17 +272,16 @@ class MysqlOperations:
         """
         delete old data from datatable.
         deletes data older than the given datetime
-        
+
         args:
             table_name: name of table to be cleaned
             older_than: data older than this date will be deleted
         """
         delete_query = f"""DELETE FROM {table_name}
                         WHERE {constants.DATETIME} < DATE_SUB(NOW(), INTERVAL {years} YEAR);"""
-        
+
         try:
             self.cursor.execute(delete_query)
             self.connection.commit()
         except Exception as e:
             raise ValueError(f"Deletion QueryError {table_name}: {e}")
-        

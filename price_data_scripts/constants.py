@@ -13,7 +13,7 @@ DERIV_TICKERS = [
     # {'id':'frxGBPUSD', 'table': 'GBPUSD'},
     # {'id':'frxUSDCAD', 'table': 'USDCAD'},
     # {'id':'frxUSDCHF', 'table': 'USDCHF'},
-    # {'id':'frxUSDJPY', 'table': 'USDJPY'},
+    # {'id':'frxUSDJPY', 'table': 'USDJPY'},-------------------
     {'id':'frxXAUUSD', 'table': 'GoldUSD'},
     {'id': 'R_50', 'table': 'Volatility_50_Index'},
     {'id': 'R_75', 'table': 'Volatility_75_Index'},
@@ -63,8 +63,8 @@ VANTAGE_FX_TICKERS = [
 ]
 
 CRYPTO_TICKERS = [
-    # 'ETHUSDT',
-    # 'BTCUSDT',
+    'ETHUSDT',
+    'BTCUSDT',
     'SOLUSDT',
     'FTTUSDT',
     'XRPUSDT',
