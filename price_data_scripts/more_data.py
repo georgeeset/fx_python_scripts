@@ -34,7 +34,7 @@ def measured_time(now_datetime:datetime, expected:str) -> str:
         return expected
     if expected == constants.W1 and (now_datetime.weekday == 0): # weekly
         return expected
-    if expected == constants.M1 and (now_datetime.day == 1): # monthly
+    if expected == constants.M1 and (now_datetime.day == 1) and (now_datetime.hour == 0): # monthly
         return expected
     return None
 
