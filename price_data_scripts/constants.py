@@ -1,6 +1,13 @@
 """ consstants file for cleaner code"""
 
-
+CONDITION_CHOICES:list[tuple] = [
+    ('C>TP','CLOSES ABOVE target price'),
+    ('C<TP', 'CLOSES BELOW target price'),
+    ('H>TP', 'HIGHEST price is ABOVE target price'),
+    ('H<TP', 'HIGHEST price is BELOW target price'),
+    ('L>TP', 'LOWEST price is ABOVE target price'),
+    ('L<TP', 'LOWEST price is BELOW target price'),
+]
 
 """ id and table name map for easy represnetation of
 database table name and api reference id for each currency pair

@@ -112,7 +112,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
 
 
     # list of query for all user accessible alert conditions
-    CONDITION_QUERY_SET = [
+    CONDITION_QUERY_SET:list[str] = [
 
         # 'CLOSING PRICE IS GREATER THAN SETPOINT',
         f"""SELECT * FROM {constants.ALERTS_TABLE}
@@ -121,7 +121,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS GREATER THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[0][0]}';
         """,
 
         # 'CLOSING PRICE IS LESS THAN SETPOINT'
@@ -131,27 +131,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'CLOSING PRICE IS LESS THAN SETPOINT';
-        """,
-
-        # 'OPENING PRICE IS GREATER THAN SETPOINT'
-        f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} < {price_row.iloc[-1][constants.OPEN]}
-        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-        AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-        AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS GREATER THAN SETPOINT';
-        """,
-
-        # 'OPENING PRICE IS LESS THAN SETPOINT'
-        f"""SELECT * FROM {constants.ALERTS_TABLE}
-        WHERE {constants.TARGET_COL} > {price_row.iloc[-1][constants.OPEN]}
-        AND {constants.CURRENCY_PAIR_COL} = '{instrument}'
-        AND {constants.EXPIRATION_COL} >= NOW()
-        AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
-        AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'OPENING PRICE IS LESS THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[1][0]}';
         """,
 
         # 'HIGHEST PRICE IS GREATER THAN SETPOINT'
@@ -161,7 +141,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS GREATER THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[2][0]}';
         """,
 
         # 'HIGHEST PRICE IS LESS THAN SETPOINT'
@@ -171,7 +151,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'HIGHEST PRICE IS LESS THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[3][0]}';
         """,
 
         # 'LOWEST PRICE IS GREATER THAN SETPOINT'
@@ -181,7 +161,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS GREATER THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[4][0]}';
         """,
 
         # 'LOWEST PRICE IS LESS THAN SETPOINT'
@@ -191,7 +171,7 @@ async def alert_query_manager(price_row:pd.DataFrame, instrument:str, timeframe:
         AND {constants.EXPIRATION_COL} >= NOW()
         AND {constants.REPEAT_ALARM_COL} > {constants.ALERT_COUNT}
         AND {constants.TIMEFRAME} = '{timeframe}'
-        AND {constants.SETUP_CONDITION_COL} = 'LOWEST PRICE IS LESS THAN SETPOINT';
+        AND {constants.SETUP_CONDITION_COL} = '{constants.CONDITION_CHOICES[5][0]}';
         """
     ]
 
