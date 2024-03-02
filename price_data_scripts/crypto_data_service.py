@@ -34,7 +34,7 @@ async def crypto_data_service():
             continue
         else:
             # candles_data = data_handler(response)
-            mysql_operations.store_data(candles_data.iloc[-2:], current_pair, -1, False)
+            mysql_operations.store_data(candles_data.iloc[-2:], current_pair)
 
             # QUERY db to get h4 d1 w1 and m1 data
             # then store in separate tables using store_in_db function
