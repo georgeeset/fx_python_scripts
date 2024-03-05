@@ -20,7 +20,7 @@ DERIV_TICKERS = [
     # {'id':'frxGBPUSD', 'table': 'GBPUSD'},
     # {'id':'frxUSDCAD', 'table': 'USDCAD'},
     # {'id':'frxUSDCHF', 'table': 'USDCHF'},
-    # {'id':'frxUSDJPY', 'table': 'USDJPY'},
+    # {'id':'frxUSDJPY', 'table': 'USDJPY'},-------------------
     {'id':'frxXAUUSD', 'table': 'GoldUSD'},
     {'id': 'R_50', 'table': 'Volatility_50_Index'},
     {'id': 'R_75', 'table': 'Volatility_75_Index'},
@@ -80,7 +80,7 @@ CRYPTO_TICKERS = [
     'FTTUSDT',
     'AVAXUSDT',
     'TIAUSDT',
-    'AVAXUSDT',
+    'AVAXUSDT'
     ]
 
 KLINE_COLUMN_NAMES= ['open_time','Open',
@@ -132,6 +132,15 @@ D1 = 'D1'
 W1 = 'W1'
 M1 = 'M1'
 
+# Approved candlestick chart patterns
+APPROVED_PATTERNS = ['engulfing', 'morningstar', 'morningdojistar', '3blackcrows',
+                     'abandonedbaby',  'dojistar', 'dragonflydoji', 'eveningdojistar',
+                     'gravestonedoji', 'longleggeddoji', 'morningdojistar', 'kicking',
+                     'kickingbylength', 'hammer', 'invertedhammer', '3whitesoldiers',
+                     'spinningtop', 'piercing', 'darkcloudcover', 'risefall3methods',
+                     'xsidegap3methods', 'shootingstar', 'hangingman', 'harami',
+                     'haramicross', 
+                     ]
 LEVEL = 'Level'
 FREQUENCY = 'Frequency'
 ISSUPPORT = 'is_support'

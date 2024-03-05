@@ -42,6 +42,7 @@ class BinanceData:
             raise ConnectionError("unable to get data for ticker {}".format(ticker))
 
         data = self._convert_data(response)
+        # print(type(data[constants.CLOSE].iloc[-1])) # its a fucking string
         return data
     
     def _convert_data(self, payload:list) -> pd.DataFrame:
@@ -62,9 +63,8 @@ class BinanceData:
                         'taker_base_vol','taker_quote_vol', 'ignore'
                         ],axis=1,inplace=True)
         price_data.set_index(constants.DATETIME,inplace=True)
-        # due to deriv api hourly agregation, the last row is not a complete hour.
-        if price_data.index[-1].hour == datetime.now().hour:
-            # print(price_data.index[-1])
-            # print("hour is same as current hour")
-            price_data.drop(price_data.index[-1], axis=0, inplace=True)
+
+        # due to deriv api is not a complete timeframe
+        price_data.drop(price_data.index[-1], axis=0, inplace=True)
+
         return price_data

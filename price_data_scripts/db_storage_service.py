@@ -60,13 +60,13 @@ class MysqlOperations:
         except pymysql.Error as e:
                 raise ValueError("Error connecting to MySQL:", e)
 
-    def __create_table(self, pair) -> None:
+    def __create_price_table(self, pair) -> None:
         """
         creates a database table for curency pair
         if it doesn't already exist
 
         args: 
-            pair: currency pair or instrument
+            pair: currency pair or instrument e.g EURUSD_D1
         
         throws:
             valueErrr if operation fails
@@ -85,6 +85,7 @@ class MysqlOperations:
         
         try:
             self.cursor.execute(create_query)
+            self.connection.commit()
         except Exception as err:
             raise ValueError("Error while creating table {pair}=> ", err)
 
@@ -102,7 +103,7 @@ class MysqlOperations:
         if not self.is_connected:
             raise ValueError("db is not connected")
         
-        self.__create_table(pair)
+        self.__create_price_table(pair)
 
        
 
@@ -122,9 +123,10 @@ class MysqlOperations:
              
             try:
                 self.cursor.execute(add_query)
-                self.connection.commit()
             except Exception as e:
                 raise ValueError(f'error loading file => {pair}: {e}')
+
+        self.connection.commit()
 
 
     def __create_sr_table(self, table_name):
@@ -139,6 +141,7 @@ class MysqlOperations:
         
         try:
             self.cursor.execute(create_query)
+            self.connection.commit()
         except Exception as err:
             raise ValueError("Error while creating table {table_name}=>", err)
 
@@ -166,11 +169,55 @@ class MysqlOperations:
              
             try:
                 self.cursor.execute(add_query)
-                self.connection.commit()
             except Exception as e:
                 raise ValueError(f'error loading file => {sr_table}: {e}')
+        self.connection.commit()
 
 
+    def query_sr(self, price:float, pair:str) -> pd.DataFrame:
+        """
+        query support/ resistance database withing a given time range
+        tollerance range is +/-.45%
+
+        args:
+            price: closing price of the stock
+            pair: currency pair or instrument
+                will be used to make the table name
+        returns:
+            pandas dataframe containing query result or empty dataframe
+        """
+        table_name = pair+'_sr'
+        tollerance = price * 0.0028 # .45% of price as tollenace range
+        upper_limit = price + tollerance
+        lower_limit = price - tollerance
+        print(f"upper limit: {upper_limit}\nlower limit: {lower_limit}")
+        #TODO consider using ATR so that price volatility will be included
+         
+        sr_query = f"""SELECT {constants.DATETIME}, {constants.ISSUPPORT}
+                    FROM {table_name}
+                    WHERE {constants.LEVEL} BETWEEN {lower_limit} AND {upper_limit}
+                    ORDER BY {constants.DATETIME} ASC;"""
+        
+        try:
+            self.cursor.execute(sr_query)
+            table = self.cursor.fetchall()
+        except pymysql.DatabaseError as err :
+            print(type(err))
+            raise ValueError(f'error loading file => {table_name}: {err}')
+        
+        if len(table) < 1:
+            return pd.DataFrame()
+        # print(table)
+    
+        df_result = pd.DataFrame(table, columns=[
+            constants.DATETIME,
+            constants.ISSUPPORT
+            ])
+        df_result.set_index(constants.DATETIME, inplace=True)
+
+        return df_result
+
+    
     def delete_table(self, table_name:str) -> None:
         """ 
         delete a database table
@@ -181,9 +228,11 @@ class MysqlOperations:
         queryX = f"""DROP TABLE {table_name} """
 
         try:
-            self.cursor.execute(queryX),
+            self.cursor.execute(queryX)
+            self.connection.commi()
         except Exception as e:
             raise ValueError(f'DELETING TABLE ERROR occured: ==> {e}')
+
 
     def get_recent_price(self, table_name:str, number:int) -> pd.DataFrame:
         """
@@ -197,7 +246,7 @@ class MysqlOperations:
         price_query = f"""
         SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}, {constants.VOLUME}
         FROM {table_name}
-        ORDER BY {constants.DATETIME} ASC
+        ORDER BY {constants.DATETIME} DESC
         LIMIT {number};
         """
         try:
@@ -217,23 +266,22 @@ class MysqlOperations:
             constants.VOLUME
             ])
         df_result.set_index(constants.DATETIME, inplace=True)
-        return df_result
+        return df_result[::-1] # reverse the dataframe to stand upright
         
     def delete_old_data(self, table_name: pd.DataFrame, years:int):
         """
         delete old data from datatable.
         deletes data older than the given datetime
-        
+
         args:
             table_name: name of table to be cleaned
             older_than: data older than this date will be deleted
         """
         delete_query = f"""DELETE FROM {table_name}
                         WHERE {constants.DATETIME} < DATE_SUB(NOW(), INTERVAL {years} YEAR);"""
-        
+
         try:
             self.cursor.execute(delete_query)
             self.connection.commit()
         except Exception as e:
             raise ValueError(f"Deletion QueryError {table_name}: {e}")
-        
