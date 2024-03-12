@@ -35,7 +35,7 @@ class PatternDetector(MysqlOperations):
         # target value in the specified row
         mask = (result.iloc[target_index] != target_value)
         # print(data)
-
+        
         # get column names
         spotted_list = result.columns[mask].to_list()
         # print(spotted_list)
@@ -72,13 +72,11 @@ class PatternDetector(MysqlOperations):
 
     def update_message_count(self, data:pd.DataFrame) -> None:
         """increment alert count"""
-        for item in data.itertuples:
+        for index, item in data.iterrows():
             self.increment_alert_count(constants.PATTERN_ALERT_TBL,
                                        constants.ALERT_COUNT,
-                                       item[constants.id]
+                                       item[constants.ID]
                                        )
 
     def clean(self) -> None:
         self.disconnect()
-
-    dispose = close = disconnect = clean
