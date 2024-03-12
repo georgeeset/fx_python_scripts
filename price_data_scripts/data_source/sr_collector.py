@@ -3,7 +3,7 @@ module that determine support and resistance of price
 """
 import pandas as pd
 import numpy as np
-import constants
+from price_data_scripts.utils import constants
 
 
 class SRCollector:

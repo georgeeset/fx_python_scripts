@@ -3,7 +3,7 @@
 from datetime import datetime
 import pandas as pd
 import pymysql
-import price_and_data_scripts.utils.constants as constants
+from . import constants
 import os
 import logging
 
@@ -190,7 +190,7 @@ class MysqlOperations:
         tollerance = price * 0.0028 # .45% of price as tollenace range
         upper_limit = price + tollerance
         lower_limit = price - tollerance
-        print(f"upper limit: {upper_limit}\nlower limit: {lower_limit}")
+
         #TODO consider using ATR so that price volatility will be included
          
         sr_query = f"""SELECT {constants.DATETIME}, {constants.ISSUPPORT}
@@ -267,7 +267,7 @@ class MysqlOperations:
             ])
         df_result.set_index(constants.DATETIME, inplace=True)
         return df_result[::-1] # reverse the dataframe to stand upright
-        
+
     def delete_old_data(self, table_name: pd.DataFrame, years:int):
         """
         delete old data from datatable.
@@ -285,3 +285,53 @@ class MysqlOperations:
             self.connection.commit()
         except Exception as e:
             raise ValueError(f"Deletion QueryError {table_name}: {e}")
+
+
+    def query_pattern_table(self, pair:str, timeframe:str, alert_limit:int=1) -> pd.DataFrame:
+        """
+        query pattern table with given currency pair and timeframe
+        """
+
+        query_str = f"""SELECT fxmktwatch_patternalert.id ,
+                            fxmktwatch_patternalert.alertcount, 
+                            fxmktwatch_patternalert.note, 
+                            fxmktwatch_patternalert.timeframe, 
+                            fxmktwatch_alertmedium.alert_type, 
+                            fxmktwatch_alertmedium.alert_id,
+                            fxmktwatch_alertmedium.chat_id
+                        FROM fxmktwatch_patternalert
+                        INNER JOIN fxmktwatch_alertmedium
+                        ON fxmktwatch_patternalert.alert_medium_id = fxmktwatch_alertmedium.id
+                        WHERE fxmktwatch_patternalert.currency_pair = '{pair}'
+                        AND fxmktwatch_patternalert.timeframe = '{timeframe}'
+                        AND fxmktwatch_patternalert.alertcount < {alert_limit};"""
+        
+        self.cursor.execute(query_str)
+        data = self.cursor.fetchall()
+
+        if not data:
+            return pd.DataFrame()
+        
+        df_data = pd.DataFrame(data, columns=[
+            constants.ID, constants.ALERT_COUNT, constants.NOTE_COL,
+            constants.TIMEFRAME, constants.ALERT_TYPE, constants.ALERT_ID,
+            constants.CHAT_ID
+        ])
+
+        return df_data
+    
+    def increment_alert_count(self,table:str, col_name, target_id:int) -> None:
+        """
+        increment pattern alert's alert_count field
+        """
+        update_query = f"""UPDATE {table}
+                        SET {col_name} = {col_name} + 1
+                        WHERE {constants.ID} = {target_id}"""
+        try:
+            self.cursor.execute(update_query)
+            self.connection.commit()
+        except Exception as e:
+            raise ValueError(f'Failed to increment count: {table} : {col_name} => {e}')
+        
+
+

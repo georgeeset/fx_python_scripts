@@ -6,13 +6,13 @@ import asyncio
 import logging
 import os
 import pandas as pd
-import price_and_data_scripts.utils.constants as constants
+import price_data_scripts.utils.constants as constants
 from datetime import datetime
 from binance.spot import Spot
-from price_and_data_scripts.utils.db_storage_service import MysqlOperations
-from price_and_data_scripts.utils.alert_query_service import alert_query_manager
-from price_and_data_scripts.utils.more_data import tf_query_manager, measured_time
-from price_and_data_scripts.data_source.binance import BinanceData
+from price_data_scripts.utils.db_storage_service import MysqlOperations
+from price_data_scripts.utils.alert_query_service import alert_query_manager
+from price_data_scripts.utils.more_data import tf_query_manager, measured_time
+from price_data_scripts.data_source.binance import BinanceData
 
 async def crypto_data_service():
     """ extract crypto prices and query alerts
@@ -49,7 +49,6 @@ async def crypto_data_service():
             query_async_tasks.append(query_task)
 
         # Query for other timeframe alerts and send emails also
-        # TODO for other timeframe, check if time is right before querying the other timeframe
         if measured_time(now, constants.H4) == constants.H4:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.H4))
             query_async_tasks.append(query_task)

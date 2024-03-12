@@ -4,15 +4,15 @@ analize the data and store key support and resistance levels in database.
 recommended to run every 10-15 days
 """
 import logging
-import price_and_data_scripts.utils.constants as constants
+import price_data_scripts.utils.constants as constants
 import pandas as pd
 import os
 import sys
 
-from price_and_data_scripts.utils.db_storage_service import MysqlOperations
-from price_and_data_scripts.data_source.sr_collector import SRCollector
-from price_and_data_scripts.data_source.binance import BinanceData
-from price_and_data_scripts.utils.pattern_detector import PatternDetector
+from price_data_scripts.utils.db_storage_service import MysqlOperations
+from price_data_scripts.data_source.sr_collector import SRCollector
+from price_data_scripts.data_source.binance import BinanceData
+from price_data_scripts.utils.pattern_detector import PatternDetector
 
 
 def request_big_data(argv) -> pd.DataFrame:
@@ -78,12 +78,12 @@ def request_big_data(argv) -> pd.DataFrame:
             logging.info(f"No support/Resistance found: {d1_table}")
             # print(f"nothing found on support/resistance: {big_pair}")
 
-        #TODO move the below block to daily activity as it is needed there
-        try:
-            pattern_detector.check_patterns(data, pair)
-        except Exception as e:
-            logging.error(f"pattern detection failed: {e}")
-            print(f"error detecting pattern {e}")
+        # #TODO move the below block to daily activity as it is needed there
+        # try:
+        #     pattern_detector.check_patterns(data, pair)
+        # except Exception as e:
+        #     logging.error(f"pattern detection failed: {e}")
+        #     print(f"error detecting pattern {e}")
         
         # delete old data from support/resistance history
         my_db.delete_old_data(table_name=sr_table, years=3)

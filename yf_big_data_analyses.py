@@ -7,13 +7,13 @@ from datetime import datetime, timedelta
 import pandas as pd
 import logging
 import os
-import price_and_data_scripts.utils.constants as constants
+from price_data_scripts.utils import constants
 
-from price_and_data_scripts.data_source.yf import fetch_yf
-from price_and_data_scripts.utils.db_storage_service import MysqlOperations
-from price_and_data_scripts.data_source.sr_collector import SRCollector
-from price_and_data_scripts.data_source.alpha_vantage import AlphaVantage
-from price_and_data_scripts.utils.pattern_detector import PatternDetector
+from price_data_scripts.data_source.yf import fetch_yf
+from price_data_scripts.utils.db_storage_service import MysqlOperations
+from price_data_scripts.data_source.sr_collector import SRCollector
+from price_data_scripts.data_source.alpha_vantage import AlphaVantage
+from price_data_scripts.utils.pattern_detector import PatternDetector
 
 def request_big_data() -> pd.DataFrame:
     """
@@ -69,12 +69,12 @@ def request_big_data() -> pd.DataFrame:
             logging.error(f"No support/Resistance found: {pair}")
             print(f"nothing found on support/resistance: {pair}")
 
-        #TODO move the below block to daily activity as it is needed there
-        try:
-            pattern_detector.check_patterns(data, pair)
-        except Exception as e:
-            logging.error(f"pattern detection failed: {e}")
-            print(f"error detecting pattern {e}")
+        # #TODO move the below block to daily activity as it is needed there
+        # try:
+        #     pattern_detector.check_patterns(data, pair)
+        # except Exception as e:
+        #     logging.error(f"pattern detection failed: {e}")
+        #     print(f"error detecting pattern {e}")
     
         # delete old data from support/resistance history
         my_db.delete_old_data(table_name=pair+'_sr', years=2)

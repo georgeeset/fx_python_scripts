@@ -91,6 +91,12 @@ KLINE_COLUMN_NAMES= ['open_time','Open',
                ]
 
 RESULT = 'result'
+PATTERNS = 'patterns'
+LASTUSED = 'last_used'
+Frequency = 'frequency'
+RECENT_STATUS = 'recent_status'
+PATTERN_ALERT_TBL = 'fxmktwatch_patternalert'
+
 
 OPEN = 'Open'
 HIGH = 'High'
@@ -173,6 +179,27 @@ Reminder Note: {note}
 
 TRADE WISELY !!!
 
+"""
+
+PATTERN_ALERT_MESSAGE = """Hi,
+Your Pattern Alert have been traggered,
+Kindly check your chart to analyze the market.
+details:
+
+Candlestick pattern(s): {patterns}
+
+Instrument: {c_pair}
+
+Served as support/resistance {used} times
+
+Recently served as: {recent_status} on {last_used}
+
+Alert Counter: {alert_count}
+
+Reminder Note: {note}
+
+NB: 
+Consult an expart for fiancial advice
 """
 
 HTML_MESSAGE = """

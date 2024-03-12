@@ -2,7 +2,7 @@
 collects data form alpha vantage api
 """
 import os
-import constants
+from price_data_scripts.utils import constants
 import time
 import pandas as pd
 from alpha_vantage.timeseries import TimeSeries

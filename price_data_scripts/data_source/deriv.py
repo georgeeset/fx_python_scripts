@@ -5,8 +5,7 @@ This module defines a `DerivManager` class for managing API connections and retr
 candle data.
 """
 
-import asyncio
-import constants
+from price_data_scripts.utils import constants
 import pandas as pd
 from datetime import datetime
 from deriv_api import DerivAPI

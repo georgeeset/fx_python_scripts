@@ -4,14 +4,14 @@ update database and send alerts
 """
 import asyncio
 from datetime import datetime, timedelta
-from price_and_data_scripts.utils import constants
+from price_data_scripts.utils import constants
 import logging
 import os
 import pandas as pd
-from price_and_data_scripts.utils.db_storage_service import MysqlOperations
-from price_and_data_scripts.utils.alert_query_service import alert_query_manager
-from price_and_data_scripts.utils.more_data import tf_query_manager, measured_time
-from price_and_data_scripts.data_source.deriv import DerivManager
+from price_data_scripts.utils.db_storage_service import MysqlOperations
+from price_data_scripts.utils.alert_query_service import alert_query_manager
+from price_data_scripts.utils.more_data import tf_query_manager, measured_time
+from price_data_scripts.data_source.deriv import DerivManager
 
 # print(os.getcwd())  # Should output the project root path
 

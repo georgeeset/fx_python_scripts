@@ -3,7 +3,7 @@ module used to download historical price data from binance api
 """
 
 import pandas as pd
-import constants
+from price_data_scripts.utils import constants
 from binance.spot import Spot
 from datetime import datetime
 

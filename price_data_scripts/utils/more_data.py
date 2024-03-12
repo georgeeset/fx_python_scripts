@@ -6,12 +6,12 @@ and m1 data to be store d in separate table
 from calendar import calendar
 import pandas as pd
 import pymysql
-import constants
+from . import  constants
 import os
 import logging
 from datetime import datetime, timedelta
 
-from db_storage_service import MysqlOperations
+from .db_storage_service import MysqlOperations
 
 def monthdelta(date, delta):
     m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12

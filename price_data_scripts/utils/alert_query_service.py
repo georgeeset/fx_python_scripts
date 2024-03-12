@@ -4,12 +4,11 @@ Check alert databasae for triggered alerts and contact user asap
 
 import pandas as pd
 import pymysql
-import constants
+from . import constants
 import os
 import logging
 import aiosmtplib
 import requests
-from datetime import datetime
 import asyncio
 
 

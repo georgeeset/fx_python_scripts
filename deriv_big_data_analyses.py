@@ -5,15 +5,15 @@ recommended to run every 10-15 days
 """
 import asyncio
 import logging
-import price_and_data_scripts.utils.constants as constants
+import price_data_scripts.utils.constants as constants
 import pandas as pd
 import os
 
 from datetime import datetime, timedelta
-from price_and_data_scripts.utils.db_storage_service import MysqlOperations
-from price_and_data_scripts.data_source.sr_collector import SRCollector
-from price_and_data_scripts.data_source.deriv import DerivManager
-from price_and_data_scripts.utils.pattern_detector import PatternDetector
+from price_data_scripts.utils.db_storage_service import MysqlOperations
+from price_data_scripts.data_source.sr_collector import SRCollector
+from price_data_scripts.data_source.deriv import DerivManager
+from price_data_scripts.utils.pattern_detector import PatternDetector
 
 
 async def request_big_data() -> pd.DataFrame:
@@ -80,17 +80,9 @@ async def request_big_data() -> pd.DataFrame:
             my_db.store_sr(sr_df, item[constants.TABLE])   # add data received to database
         else:
             logging.info(f"No support/Resistance found: {tbl_name}")
-            # print(f"nothing found on support/resistance: {big_pair}")
+            # print(f"nothing found on support/resistance: {big_pair}")         
 
-        retries = 4
-        
-        #TODO move the below block to daily activity as it is needed there
-        try:
-            pattern_detector.check_patterns(data, item[constants.TABLE])
-        except Exception as e:
-            logging.error(f"pattern detection failed: {e}")
-            print(f"error detecting pattern {e}")
-        # delete old data from support/resistance history
+        # # delete old data from support/resistance history
         my_db.delete_old_data(table_name=sr_table, years=2)
 
     await data_source.disconnect()
