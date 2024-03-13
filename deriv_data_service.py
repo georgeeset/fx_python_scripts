@@ -97,7 +97,7 @@ async def connect_attempt() -> None:
 
 async def task_function() -> None:
     """
-    this functio is basically to manage the connection attempt function
+    this function is basically to manage the connection attempt function
     it does not have timeout exception so I had to make a asymcio task
     to manage the process and cancle it when it gets stuck due to network
     faulure or server issues.
