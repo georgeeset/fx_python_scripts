@@ -88,6 +88,27 @@ async def request_big_data() -> pd.DataFrame:
     await data_source.disconnect()
     my_db.disconnect()
 
+async def task_function() -> None:
+    """
+    this function is basically to manage the connection attempt function
+    it does not have timeout exception so I had to make a asymcio task
+    to manage the process and cancle it when it gets stuck due to network
+    faulure or server issues.
+    Note: it is hardcoded to terminate in 100 seconds which is sufficient for now
+    """
+
+    task = asyncio.create_task(request_big_data())
+
+    try:
+        await asyncio.wait_for(task, timeout=100)
+    except asyncio.TimeoutError:
+        logging.error("Task timed out!")
+        task.cancel()  # Attempt to cancel if timed out
+
+    else:
+        # Task completed successfully (can do cleanup here)
+        pass
+
 
 if __name__ == "__main__":
 
@@ -106,6 +127,6 @@ if __name__ == "__main__":
     # for arg in sys.argv:
     #     print(arg)
 
-    asyncio.run(request_big_data())
+    asyncio.run(task_function())
 
 exit()
