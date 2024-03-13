@@ -15,7 +15,7 @@ class PatternDetector(MysqlOperations):
         """ initialization """
         super().__init__()
 
-    def check_patterns(self, data:pd.DataFrame, pair: str) -> dict | None:
+    def check_patterns(self, data:pd.DataFrame, pair: str) -> dict:
         """
         check a given dataframe for approved candlestick pattern
         only checks for last row of dataframe
@@ -31,22 +31,35 @@ class PatternDetector(MysqlOperations):
         result = data.ta.cdl_pattern(name = constants.APPROVED_PATTERNS)
         target_value = 0
         target_index = -1
+        boolish = 100
+        beerish = -100
         # Create a boolean mask to identify columns with the
         # target value in the specified row
         mask = (result.iloc[target_index] != target_value)
-        # print(data)
-        
+
         # get column names
         spotted_list = result.columns[mask].to_list()
+
+        # render = result.columns[(result != 0).any()]
+
         # print(spotted_list)
         if len(spotted_list) > 0:
-            observation = self.__query_zone(data[constants.CLOSE].iloc[target_index], pair)
+            # print(result[spotted_list[0]])
+            point = 0.0
+            if result[spotted_list[0]].iloc[target_index] == boolish:
+                point = data[constants.OPEN].iloc[target_index]
+                print('boolish')
+            else:
+                point = data[constants.CLOSE].iloc[target_index],
+                print ('beerish')
+
+            observation = self.__query_zone(point, pair)
             
             if observation:
                 observation[constants.PATTERNS] = spotted_list
                 return observation
         
-        return None
+        return {}
   
     def __query_zone(self, price:float, pair) -> dict:
         """

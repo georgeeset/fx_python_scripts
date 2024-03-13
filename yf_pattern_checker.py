@@ -19,7 +19,7 @@ async def check_pattern(timeframe:str='h1'):
     candles:int = 4
     composer = AlertComposer()
     pattern_detector = PatternDetector()
-    
+
     logging.info(f'checking pattern for {timeframe}')
 
     for item in constants.VANTAGE_FX_TICKERS:
@@ -28,7 +28,8 @@ async def check_pattern(timeframe:str='h1'):
         my_db = MysqlOperations()
         # grab data from db
         data = my_db.get_recent_price(tbl_name, candles)
-
+        # print(data)
+        pattern = {}
         try:
             pattern = pattern_detector.check_patterns(data, item)
         except Exception as e:
@@ -97,7 +98,7 @@ if __name__ == "__main__":
     force = True
     )
 
-    logging.info('pattern checking for Deriv')
+    logging.info('pattern checking for yf')
     asyncio.run(time_base_checker())
 
 exit()

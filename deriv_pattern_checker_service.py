@@ -55,7 +55,7 @@ async def check_pattern(timeframe:str='h1'):
         except Exception as e:
             logging.error(f"Message sending railed {tbl_name}:", e)
 
-    pattern_detector.close()
+    pattern_detector.clean()
     logging.info(f"pattern check complte for {timeframe}")
 
 async def time_base_checker():
