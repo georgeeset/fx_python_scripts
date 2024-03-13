@@ -89,6 +89,18 @@ if __name__ == "__main__":
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Exit if weekend 
+    week_num = datetime.today().weekday()
+    current_hour = datetime.now().hour
+    if week_num > 4 and current_hour > 0:
+        exit()
+
+    # monday morning, 1AM
+    if week_num == 0 and current_hour == 0: 
+        print("wait for one more hour")
+        exit()
+
+
     logging.basicConfig(
     level = logging.INFO,
     filemode = 'a',
