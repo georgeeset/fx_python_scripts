@@ -104,7 +104,6 @@ async def task_function() -> None:
     except asyncio.TimeoutError:
         logging.error("Task timed out!")
         task.cancel()  # Attempt to cancel if timed out
-
     else:
         # Task completed successfully (can do cleanup here)
         pass
