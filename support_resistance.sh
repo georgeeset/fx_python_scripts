@@ -1,12 +1,10 @@
-
 #!/bin/bash
 
 # find support/resistance and store in database
 
-echo $(date +%F" "%S)
+echo $(date +%F" "%T)
 
 mode="$1"
-
 
 program_list=(
     "/home/gtwo/venvs/fx-scripts/bin/python3 /home/gtwo/docs/fx_python_scripts/crypto_big_data_analyses.py 2>> /var/log/crypto_big_data.log"

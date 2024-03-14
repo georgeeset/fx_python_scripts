@@ -1,11 +1,9 @@
-
 #!/bin/bash
 
 # run the python script and append standard output and standard errors to /var/>
-echo $(date +%F" "%S)
+echo $(date +%F" "%T)
 
 mode="$1"
-
 
 program_list=(
     "/home/gtwo/venvs/fx-scripts/bin/python3 /home/gtwo/docs/fx_python_scripts/yfinance_data_service.py 2>> /var/log/yfx.log"

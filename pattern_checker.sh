@@ -1,12 +1,10 @@
-
 #!/bin/bash
 
 # check for price patterns and send alert to users.
 
-echo $(date +%F" "%S)
+echo $(date +%F" "%T)
 
 mode="$1"
-
 
 program_list=(
     "/home/gtwo/venvs/fx-scripts/bin/python3 /home/gtwo/docs/fx_python_scripts/yf_pattern_checker_service.py 2>> /var/log/yfx_pattern.log"
