@@ -99,7 +99,7 @@ if __name__ == "__main__":
     level = logging.INFO,
     filemode = 'a',
     filename = os.path.join(script_dir, 'logs/big_crypto.log'),
-    format='%(asctime)s %(levelname)s %(message)s',
+    format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    
     datefmt='%Y-%m-%d %H:%M:%S',
     force = True
     )
