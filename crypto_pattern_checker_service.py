@@ -28,11 +28,12 @@ async def check_pattern(timeframe:str='h1'):
         # grab data from db
         data = my_db.get_recent_price(tbl_name, candles)
 
-        try:
-            pattern = pattern_detector.check_patterns(data, item)
-        except Exception as e:
-            logging.error(f"pattern detection failed > {tbl_name}: {e}")
-            # print(f"error detecting pattern {e}")
+        # try:
+        pattern = pattern_detector.check_patterns(data, item)
+        # except Exception as e:
+        #     logging.error(f"pattern detection failed > {tbl_name}: {e}")
+        #     # print(f"error detecting pattern {e}")
+        #     continue
 
         if not pattern:
             logging.info(f"no pattern seen: {tbl_name}")

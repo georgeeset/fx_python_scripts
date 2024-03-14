@@ -46,11 +46,13 @@ class PatternDetector(MysqlOperations):
         if len(spotted_list) > 0:
             # print(result[spotted_list[0]])
             point = 0.0
+            # print(result[spotted_list[0]].iloc[target_index])
+            # print( type(result[spotted_list[0]].iloc[target_index]))
             if result[spotted_list[0]].iloc[target_index] == boolish:
                 point = data[constants.OPEN].iloc[target_index]
                 print('boolish')
             else:
-                point = data[constants.CLOSE].iloc[target_index],
+                point = data[constants.CLOSE].iloc[target_index]
                 print ('beerish')
 
             observation = self.__query_zone(point, pair)

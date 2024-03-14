@@ -187,7 +187,7 @@ class MysqlOperations:
             pandas dataframe containing query result or empty dataframe
         """
         table_name = pair+'_sr'
-        tollerance = float(price) * 0.0028 # .45% of price as tollenace range
+        tollerance = float(price) * 0.0028 # .28% of price as tollenace range
         upper_limit = price + tollerance
         lower_limit = price - tollerance
 
