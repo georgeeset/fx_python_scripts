@@ -132,6 +132,9 @@ USER_ID_COL = 'user_id'
 EMAIL = 'email'
 TELEGRAM = 'telegram'
 
+SR_SCAN_WINDOW = 14 # sr scan window for analyses
+SR_HISTORY_LIMIT = 3 # years to keep history
+
 H1 = 'H1'
 H4 = 'H4'
 D1 = 'D1'

@@ -20,10 +20,11 @@ def request_big_data() -> pd.DataFrame:
     Get data from cloud to database.
     2 years daily data or 1 month daily data
     """
-    my_scan_window = 12 # sr scan window for analyses
+    my_scan_window = constants.SR_SCAN_WINDOW# sr scan window for analyses
+    sr_history_limit = constants.SR_HISTORY_LIMIT
 
     my_db = MysqlOperations()
-    sr_collector = SRCollector(scan_window=12)
+    sr_collector = SRCollector(scan_window=my_scan_window)
     fx = AlphaVantage()
     pattern_detector =PatternDetector()
 
@@ -77,7 +78,7 @@ def request_big_data() -> pd.DataFrame:
         #     print(f"error detecting pattern {e}")
     
         # delete old data from support/resistance history
-        my_db.delete_old_data(table_name=pair+'_sr', years=2)
+        my_db.delete_old_data(table_name=pair+'_sr', years=sr_history_limit)
 
     my_db.disconnect()
 

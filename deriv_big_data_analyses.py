@@ -23,7 +23,8 @@ async def request_big_data() -> pd.DataFrame:
     """
     interval = 86400
     period = None
-    my_scan_window = 12 # sr scan window for analyses
+    my_scan_window = constants.SR_SCAN_WINDOW # sr scan window for analyses
+    sr_history_limit = constants.SR_HISTORY_LIMIT # years to keep history
 
     my_db = MysqlOperations()
     sr_collector = SRCollector(scan_window=my_scan_window)
@@ -83,7 +84,7 @@ async def request_big_data() -> pd.DataFrame:
             # print(f"nothing found on support/resistance: {big_pair}")         
 
         # # delete old data from support/resistance history
-        my_db.delete_old_data(table_name=sr_table, years=2)
+        my_db.delete_old_data(table_name=sr_table, years=sr_history_limit)
 
     await data_source.disconnect()
     my_db.disconnect()

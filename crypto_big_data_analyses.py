@@ -22,12 +22,12 @@ def request_big_data(argv) -> pd.DataFrame:
     """
     interval = '1d'
     period = None
-    my_scan_window = 12 # sr scan window for analyses
+    my_scan_window = constants.SR_SCAN_WINDOW # sr scan window for analyses
+    sr_history_limit = constants.SR_HISTORY_LIMIT
 
     my_db = MysqlOperations()
     sr_collector = SRCollector(scan_window=my_scan_window)
     data_source = BinanceData()
-    pattern_detector = PatternDetector()
 
     for arg in argv:
         print(arg)
@@ -86,7 +86,7 @@ def request_big_data(argv) -> pd.DataFrame:
         #     print(f"error detecting pattern {e}")
         
         # delete old data from support/resistance history
-        my_db.delete_old_data(table_name=sr_table, years=3)
+        my_db.delete_old_data(table_name=sr_table, years=sr_history_limit)
 
     my_db.disconnect()
 
