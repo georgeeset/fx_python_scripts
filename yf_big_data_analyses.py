@@ -87,6 +87,12 @@ if __name__ == "__main__":
     # Get the script's absolute path
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
+    
+    # Exit if weekend
+    week_num = datetime.today().weekday()
+    if week_num > 4:
+        exit()
+
     logging.basicConfig(
     level = logging.INFO,
     filemode = 'a',
