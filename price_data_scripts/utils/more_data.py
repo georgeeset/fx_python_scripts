@@ -38,7 +38,6 @@ def measured_time(now_datetime:datetime, expected:str) -> str | None:
         return expected
     return None
 
-
 def tf_query_manager(source_table:str):
     """
         query price data form hourly data and compile higher timeframe.
@@ -47,9 +46,6 @@ def tf_query_manager(source_table:str):
     """
 
     now_datetime = datetime.now()
-
-
-    target_time = None
    
     if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
         upadte_table(source_table, source_table[:-2] + constants.H4, number=4, period=constants.HOUR)
@@ -72,10 +68,12 @@ def tf_query_manager(source_table:str):
 def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     """
         query hourly data table amd make a new table from it
+
         args:
-            source_table:
-            new_table:
-            target_time:
+            source_table: table name containing source of data
+            new_table: name of destination table after compiling new data
+            number: number of candle period
+            period: DAY, MONTH, HOUR
     """
 
     my_sql_operations = MysqlOperations()
@@ -89,7 +87,6 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     )
 
     cursor = connection.cursor()
-    # type(target_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     if not isinstance(source_table, str) or not isinstance(new_table, str):
         raise(TypeError, "source_table and new_table must be string")
@@ -137,8 +134,6 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     if show_error:
         logging.warning(f"required data length for {period} is not complete: {len(df_result)} {source_table}")
 
-    # print(df_result)
-
     if len(df_result) == 0:
         logging.error("no data found on database. for {}".format(new_table))
         return
@@ -147,9 +142,7 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     high = df_result[constants.HIGH].max()
     low = df_result[constants.LOW].min()
     close = df_result.iloc[-1][constants.CLOSE]
-    close_datetime = df_result.iloc[-1][constants.DATETIME]
-
-    # print(close_datetime)
+    close_datetime = datetime.now().replace(microsecond=0, second=0, minute=0)
 
     new_data = pd.DataFrame(data = {
         constants.DATETIME: [close_datetime],
