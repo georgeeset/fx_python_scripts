@@ -10,6 +10,7 @@ from price_data_scripts.utils.messenger import Messenger
 import pandas as pd
 from datetime import datetime
 from price_data_scripts.utils.alert_composer import AlertComposer
+from price_data_scripts.utils.trading_time import fx_is_open
 
 
 async def check_pattern(timeframe:str='h1'):
@@ -90,9 +91,7 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Exit if weekend
-    week_num = datetime.today().weekday()
-    current_hour = datetime.now().hour
-    if week_num > 4:
+    if not fx_is_open(datetime.now()):
         exit()
 
     logging.basicConfig(

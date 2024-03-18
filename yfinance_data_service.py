@@ -11,6 +11,7 @@ from price_data_scripts.utils.db_storage_service import MysqlOperations
 from price_data_scripts.utils.alert_query_service import alert_query_manager
 from price_data_scripts.utils.more_data import tf_query_manager, measured_time
 from price_data_scripts.data_source.yf import fetch_yf
+from price_data_scripts.utils.trading_time import fx_is_open
 
 
 async def get_yf_data():
@@ -61,12 +62,9 @@ async def get_yf_data():
 
 
 if __name__ == '__main__':
-
-    # Exit if weekend 
-    week_num = datetime.today().weekday()
-    current_hour = datetime.now().hour
     
-    if week_num > 4:
+    # Exit if weekend
+    if not fx_is_open(datetime.now()):
         exit()
 
     # Get the script's absolute path

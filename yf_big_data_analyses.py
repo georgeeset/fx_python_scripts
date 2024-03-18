@@ -14,6 +14,7 @@ from price_data_scripts.utils.db_storage_service import MysqlOperations
 from price_data_scripts.data_source.sr_collector import SRCollector
 from price_data_scripts.data_source.alpha_vantage import AlphaVantage
 from price_data_scripts.utils.pattern_detector import PatternDetector
+from price_data_scripts.utils.trading_time import fx_is_open
 
 def request_big_data() -> pd.DataFrame:
     """
@@ -26,7 +27,7 @@ def request_big_data() -> pd.DataFrame:
     my_db = MysqlOperations()
     sr_collector = SRCollector(scan_window=my_scan_window)
     fx = AlphaVantage()
-    pattern_detector =PatternDetector()
+    pattern_detector = PatternDetector()
 
     for pair in constants.VANTAGE_FX_TICKERS:
 
@@ -89,8 +90,7 @@ if __name__ == "__main__":
 
     
     # Exit if weekend
-    week_num = datetime.today().weekday()
-    if week_num > 4:
+    if not fx_is_open(datetime.now()):
         exit()
 
     logging.basicConfig(
