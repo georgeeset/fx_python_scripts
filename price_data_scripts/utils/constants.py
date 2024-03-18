@@ -140,6 +140,9 @@ H4 = 'H4'
 D1 = 'D1'
 W1 = 'W1'
 M1 = 'M1'
+HOUR = 'HOUR'
+DAY = 'DAY'
+MONTH = 'MONTH'
 
 # Approved candlestick chart patterns
 APPROVED_PATTERNS = ['engulfing', 'morningstar', 'morningdojistar', '3blackcrows',

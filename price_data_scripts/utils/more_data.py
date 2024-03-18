@@ -52,32 +52,24 @@ def tf_query_manager(source_table:str):
     target_time = None
    
     if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
-        window = timedelta(hours=4)
-        target_time = now_datetime - window
-        upadte_table(source_table, source_table[:-2] + constants.H4, target_time)
+        upadte_table(source_table, source_table[:-2] + constants.H4, number=4, period=constants.HOUR)
         logging.info("H4 row added")
         # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
-        
+
     if measured_time(now_datetime, constants.D1) == constants.D1: # daily
-        window = timedelta(days=1)
-        target_time = now_datetime - window
-        upadte_table(source_table, source_table[:-2] + constants.D1, target_time)
+        upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
         logging.info("D1 row added")
 
     if measured_time(now_datetime, constants.W1) == constants.W1: # weekly
-        window = timedelta(weeks=1)
-        target_time = now_datetime - window
-        upadte_table(source_table, source_table[:-2] + constants.W1, target_time)
+        upadte_table(source_table, source_table[:-2] + constants.W1, number=7, period=constants.DAY)
         logging.info("W1 row added")
 
     if measured_time(now_datetime, constants.M1) == constants.M1: # monthly
         # subtract one month from current date
-        target_ts = now_datetime - pd.DateOffset(months=1) 
-        target_time = target_ts.to_pydatetime()
-        upadte_table(source_table, source_table[:-2] + constants.M1, target_time)
+        upadte_table(source_table, source_table[:-2] + constants.M1, number=1, period=constants.MONTH)
         logging.info("M1 row added")
 
-def upadte_table(source_table: str, new_table: str, target_time: datetime ):
+def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     """
         query hourly data table amd make a new table from it
         args:
@@ -99,17 +91,16 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
     cursor = connection.cursor()
     # type(target_time.strftime("%Y-%m-%d %H:%M:%S"))
 
-    if not isinstance(target_time, datetime):
-        raise(TypeError, "target_time must be datetime datatype")
     if not isinstance(source_table, str) or not isinstance(new_table, str):
         raise(TypeError, "source_table and new_table must be string")
 
     query_str = f"""
         SELECT {constants.DATETIME}, {constants.OPEN}, {constants.HIGH}, {constants.LOW}, {constants.CLOSE}
         FROM {source_table}
-        WHERE {constants.DATETIME} >= '{target_time}'
+        WHERE {constants.DATETIME} >= DATE_SUB(NOW(), INTERVAL {number} {period})
         ORDER BY {constants.DATETIME} ASC;
         """
+
     cursor.execute(query_str)
     data = cursor.fetchall()
 
@@ -123,6 +114,21 @@ def upadte_table(source_table: str, new_table: str, target_time: datetime ):
         )
 
     cursor.close()
+
+    show_error = False
+    # log worning if data is not complete:
+    match period:
+        case constants.HOUR:
+            if len(df_result) < number:
+                show_error = True
+        case constants.DAY: # weekely and daily
+            if len(df_result) < (number * 24):
+                show_error = True
+        case constants.MONTH:
+            if len(df_result) < (number * )
+    
+    if show_error:
+        logging.warning(f"required data length for {period} is not complete: {len(df_result)} {source_table}")
 
     # print(df_result)
 
