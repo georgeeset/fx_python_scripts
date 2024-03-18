@@ -3,13 +3,13 @@ module is to compile more data such as h4 d1, w1
 and m1 data to be store d in separate table
 """
 
-from calendar import calendar
+import calendar
 import pandas as pd
 import pymysql
 from . import  constants
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from .db_storage_service import MysqlOperations
 
@@ -19,7 +19,7 @@ def monthdelta(date, delta):
     d = d = min(date.day, calendar.monthrange(y, m)[1])
     return date.replace(day=d,month=m, year=y)
 
-def measured_time(now_datetime:datetime, expected:str) -> str:
+def measured_time(now_datetime:datetime, expected:str) -> str | None:
     """
         checks the given time if it is right for next candle stick to start
         args:
@@ -84,7 +84,7 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     connection = pymysql.connect(
         host=os.environ.get('STORAGE_MYSQL_HOST'),
         user=os.environ.get('STORAGE_MYSQL_USER'),
-        password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
+        password=os.environ.get('STORAGE_MYSQL_PASSWORD') or "",
         db=os.environ.get('STORAGE_MYSQL_DB')
     )
 
@@ -125,7 +125,14 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
             if len(df_result) < (number * 24):
                 show_error = True
         case constants.MONTH:
-            if len(df_result) < (number * )
+            now = datetime.now()
+            month:int = now.month - 1 # previous month
+            year = now.year
+            num_days = calendar.monthrange(year, month)[1]
+            if len(df_result) < (number * 24 * num_days):
+                show_error = True
+        case _:
+            logging.info(f"everything complete for {period}: table {source_table}")
     
     if show_error:
         logging.warning(f"required data length for {period} is not complete: {len(df_result)} {source_table}")
