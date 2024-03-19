@@ -46,10 +46,13 @@ MarkupSafe==2.0.1
 more-itertools==8.10.0
 multidict==6.0.5
 multitasking==0.0.11
+mypy==1.9.0
+mypy-extensions==1.0.0
 netifaces==0.11.0
 numpy==1.26.4
 oauthlib==3.2.0
 pandas==2.2.0
+pandas-stubs==2.2.1.240316
 pandas-ta==0.3.14b0
 peewee==3.17.1
 pexpect==4.8.0
@@ -80,7 +83,10 @@ six==1.16.0
 soupsieve==2.5
 ssh-import-id==5.11
 TA-Lib==0.4.28
+tomli==2.0.1
 Twisted==22.1.0
+types-PyMySQL==1.1.0.1
+types-pytz==2024.1.0.20240203
 typing_extensions==4.9.0
 tzdata==2023.4
 tzlocal==5.2
