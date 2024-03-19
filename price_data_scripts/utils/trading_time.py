@@ -23,16 +23,16 @@ def fx_is_open(my_time:datetime) -> bool:
 
     if week_num == 4 and current_hour > 21:
         # 1hr added to enable us collect 20:00 data at 21:00
-        is_open = False
+        return False
     
     if week_num > 4:
-        is_open = False
+        return False
 
     if week_num == 0 and current_hour == 0:
         # no need to check for data when candle of the day has not formed
-        is_open = False
+        return False
 
-    return is_open
+    return True
 
 def fx_week_start_end(my_time:datetime) -> int | None :
     """
@@ -55,6 +55,7 @@ def fx_week_start_end(my_time:datetime) -> int | None :
         return 0
     
     if week_num == 0 and current_hour == 1:
+        # fiest hour of trading week
         return 1
     return None
 

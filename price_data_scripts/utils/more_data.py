@@ -15,11 +15,24 @@ from datetime import datetime
 
 from .db_storage_service import MysqlOperations
 
-def monthdelta(date, delta):
-    m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
-    if not m: m = 12
-    d = d = min(date.day, calendar.monthrange(y, m)[1])
-    return date.replace(day=d,month=m, year=y)
+def measure_time(now_datetime:datetime, expected:str) -> str | None:
+    """
+        checks the given time if it is right for next candle stick to start
+        args:
+            now_datetime: datetime to be checked
+            expected: expected result to to avoid returning only first correct value
+        return: String expected or none
+    """
+
+    if expected == constants.H4 and (now_datetime.hour % 4 == 0): # 4 hourly
+        return expected
+    if expected == constants.D1 and (now_datetime.hour == 0): # daily
+        return expected
+    if expected == constants.W1 and (now_datetime.weekday == 0): # weekly
+        return expected
+    if expected == constants.M1 and (now_datetime.day == 1) and (now_datetime.hour == 0): # monthly
+        return expected
+    return None
 
 def fx_measure_time(now_datetime:datetime, expected:str) -> str | None:
     """
@@ -68,23 +81,54 @@ def tf_query_manager(source_table:str):
 
     now_datetime = datetime.now()
    
-    if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
+    if measure_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
         upadte_table(source_table, source_table[:-2] + constants.H4, number=4, period=constants.HOUR)
         logging.info("H4 row added")
         # print(target_time.strftime("%Y-%m-%d %H:%M:%S"))
 
-    if measured_time(now_datetime, constants.D1) == constants.D1: # daily
+    if measure_time(now_datetime, constants.D1) == constants.D1: # daily
         upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
         logging.info("D1 row added")
 
-    if measured_time(now_datetime, constants.W1) == constants.W1: # weekly
+    if measure_time(now_datetime, constants.W1) == constants.W1: # weekly
         upadte_table(source_table, source_table[:-2] + constants.W1, number=7, period=constants.DAY)
         logging.info("W1 row added")
 
-    if measured_time(now_datetime, constants.M1) == constants.M1: # monthly
+    if measure_time(now_datetime, constants.M1) == constants.M1: # monthly
         # subtract one month from current date
         upadte_table(source_table, source_table[:-2] + constants.M1, number=1, period=constants.MONTH)
         logging.info("M1 row added")
+
+def fx_tf_query_manager(source_table:str) -> None:
+    """
+        query price data form hourly data and compile higher timeframe.
+        with focus on forex data, taking weekneds and market open/close
+        time into consideration
+
+        args:
+            source_table: table name for the database table
+    """
+
+    now_datetime = datetime.now()
+   
+    if fx_measure_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
+        upadte_table(source_table, source_table[:-2] + constants.H4, number=4, period=constants.HOUR)
+        logging.info("H4 row added")
+        
+
+    if fx_measure_time(now_datetime, constants.D1) == constants.D1: # daily
+        upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
+        logging.info("D1 row added")
+
+    if fx_measure_time(now_datetime, constants.W1) == constants.W1: # weekly
+        upadte_table(source_table, source_table[:-2] + constants.W1, number=7, period=constants.DAY)
+        logging.info("W1 row added")
+
+    if fx_measure_time(now_datetime, constants.M1) == constants.M1: # monthly
+        # subtract one month from current date
+        upadte_table(source_table, source_table[:-2] + constants.M1, number=1, period=constants.MONTH)
+        logging.info("M1 row added")
+
 
 def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     """

@@ -1,6 +1,6 @@
 
 import asyncio
-from price_data_scripts.utils.more_data import measured_time
+from price_data_scripts.utils.more_data import fx_measure_time
 from price_data_scripts.utils.pattern_detector import PatternDetector
 import logging
 import os
@@ -66,19 +66,19 @@ async def time_base_checker():
     checker = check_pattern()
     task_list.append(checker)
 
-    if measured_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
+    if fx_measure_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
        checker = check_pattern(constants.H4)
        task_list.append(checker)
 
-    if measured_time(now_datetime, constants.D1) == constants.D1: # daily
+    if fx_measure_time(now_datetime, constants.D1) == constants.D1: # daily
         checker = check_pattern(constants.D1)
         task_list.append(checker)
 
-    if measured_time(now_datetime, constants.W1) == constants.W1: # weekly
+    if fx_measure_time(now_datetime, constants.W1) == constants.W1: # weekly
         checker = check_pattern(constants.W1)
         task_list.append(checker)
 
-    if measured_time(now_datetime, constants.M1) == constants.M1: # monthly
+    if fx_measure_time(now_datetime, constants.M1) == constants.M1: # monthly
         checker = check_pattern(constants.M1)
         task_list.append(checker)
 
