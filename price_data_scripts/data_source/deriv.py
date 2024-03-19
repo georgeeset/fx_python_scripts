@@ -38,7 +38,7 @@ class DerivManager:
         """
         self.api = DerivAPI(app_id = 1234)
 
-    async def fetch_candles(self, pair: str, frame: str, size: int, end_time: str) -> pd.DataFrame:
+    async def fetch_candles(self, pair: str, frame: int, size: int, end_time: str) -> pd.DataFrame:
         """
         Fetches candle data from the Deriv API.
 
@@ -81,7 +81,7 @@ class DerivManager:
 
         return pd.DataFrame()
 
-    def _make_dataframe(self, candles: map) -> pd.DataFrame:
+    def _make_dataframe(self, candles: dict) -> pd.DataFrame:
         """ Convert map data to pandas Dataframe with
         all fields named with first later capitalized.
         e.g: Open Low...
@@ -92,7 +92,7 @@ class DerivManager:
         Returns: pandas DataFrame
         """
 
-        dict_data = {constants.DATETIME: [],
+        dict_data:dict = {constants.DATETIME: [],
                                 constants.OPEN: [],
                                 constants.HIGH: [],
                                 constants.LOW: [],
@@ -100,7 +100,7 @@ class DerivManager:
                                 }
 
         # Fill data into dataframe
-        for candle in candles.get(constants.CANDLES):
+        for candle in candles.get(constants.CANDLES) or []:
             dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH))) # add timezone if you wish
             dict_data[constants.OPEN].append(candle.get(constants.OPEN.lower()))
             dict_data[constants.HIGH].append(candle.get(constants.HIGH.lower()))
