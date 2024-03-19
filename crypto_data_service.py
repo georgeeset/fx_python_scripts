@@ -8,10 +8,9 @@ import os
 import pandas as pd
 import price_data_scripts.utils.constants as constants
 from datetime import datetime
-from binance.spot import Spot
 from price_data_scripts.utils.db_storage_service import MysqlOperations
 from price_data_scripts.utils.alert_query_service import alert_query_manager
-from price_data_scripts.utils.more_data import tf_query_manager, measured_time
+from price_data_scripts.utils.more_data import tf_query_manager, measure_time
 from price_data_scripts.data_source.binance import BinanceData
 
 async def crypto_data_service():
@@ -49,16 +48,16 @@ async def crypto_data_service():
             query_async_tasks.append(query_task)
 
         # Query for other timeframe alerts and send emails also
-        if measured_time(now, constants.H4) == constants.H4:
+        if measure_time(now, constants.H4) == constants.H4:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.H4))
             query_async_tasks.append(query_task)
-        if measured_time(now, constants.D1) == constants.D1:
+        if measure_time(now, constants.D1) == constants.D1:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.D1))
             query_async_tasks.append(query_task)
-        if measured_time(now, constants.W1) == constants.W1:  
+        if measure_time(now, constants.W1) == constants.W1:  
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.W1))
             query_async_tasks.append(query_task)
-        if measured_time(now, constants.M1) == constants.M1:
+        if measure_time(now, constants.M1) == constants.M1:
             query_task = asyncio.create_task(alert_query_manager(pd.DataFrame(), instrument=ticker, timeframe=constants.M1))
             query_async_tasks.append(query_task)
 

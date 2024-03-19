@@ -9,12 +9,12 @@ import asyncio
 from datetime import datetime
 from price_data_scripts.utils.db_storage_service import MysqlOperations
 from price_data_scripts.utils.alert_query_service import alert_query_manager
-from price_data_scripts.utils.more_data import tf_query_manager, fx_measure_time
+from price_data_scripts.utils.more_data import fx_tf_query_manager, fx_measure_time
 from price_data_scripts.data_source.yf import fetch_yf
 from price_data_scripts.utils.trading_time import fx_is_open
 
 
-async def get_yf_data():
+async def get_yf_data() -> None:
 
     
     query_async_tasks = []
@@ -35,7 +35,7 @@ async def get_yf_data():
 
         # QUERY db to get h4 d1 w1 and m1 data
         # then store in separate tables using store_in_db function
-        tf_query_manager(current_pair)
+        fx_tf_query_manager(current_pair)
 
         # Query for H1 alerts only and send emails
         query_task = asyncio.create_task(alert_query_manager(data, instrument=item[:-2], timeframe=constants.H1))

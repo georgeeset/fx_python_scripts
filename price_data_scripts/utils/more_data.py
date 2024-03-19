@@ -120,8 +120,8 @@ def fx_tf_query_manager(source_table:str) -> None:
         upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
         logging.info("D1 row added")
 
-    if fx_measure_time(now_datetime, constants.W1) == constants.W1: # weekly
-        upadte_table(source_table, source_table[:-2] + constants.W1, number=7, period=constants.DAY)
+    if fx_measure_time(now_datetime, constants.W1) == constants.W1: # weekly forex = 5 days
+        upadte_table(source_table, source_table[:-2] + constants.W1, number=5, period=constants.DAY)
         logging.info("W1 row added")
 
     if fx_measure_time(now_datetime, constants.M1) == constants.M1: # monthly
