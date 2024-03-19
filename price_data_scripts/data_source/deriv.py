@@ -7,7 +7,7 @@ candle data.
 
 from price_data_scripts.utils import constants
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from deriv_api import DerivAPI
 
 class DerivManager:
@@ -76,8 +76,8 @@ class DerivManager:
         if data.get(constants.CANDLES):
             # Convert raw data to a DataFrame
             candles_data = self._make_dataframe(data)
-            # candles_data.drop(candles_data.index[-1], axis=0, inplace=True)
-            # print(candles_data)
+            candles_data.drop(candles_data.index[-1], axis=0, inplace=True)
+            print(candles_data)
             return candles_data
 
         return pd.DataFrame()
@@ -100,9 +100,10 @@ class DerivManager:
                                 constants.CLOSE: []
                                 }
 
-        # Fill data into dataframe
+        # Fill data into dataframe add 1h to time to make each candle carry closing time
+        # customize for deriv data which is usually made with candle open time
         for candle in candles.get(constants.CANDLES) or []:
-            dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH))) # add timezone if you wish
+            dict_data[constants.DATETIME].append(datetime.fromtimestamp(candle.get(constants.EPOCH)) + timedelta(hours = 1)) # add timezone if you wish
             dict_data[constants.OPEN].append(candle.get(constants.OPEN.lower()))
             dict_data[constants.HIGH].append(candle.get(constants.HIGH.lower()))
             dict_data[constants.LOW].append(candle.get(constants.LOW.lower()))

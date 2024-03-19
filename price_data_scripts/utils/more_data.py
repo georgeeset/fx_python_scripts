@@ -114,7 +114,6 @@ def fx_tf_query_manager(source_table:str) -> None:
     if fx_measure_time(now_datetime, constants.H4) == constants.H4: # 4 hourly
         upadte_table(source_table, source_table[:-2] + constants.H4, number=4, period=constants.HOUR)
         logging.info("H4 row added")
-        
 
     if fx_measure_time(now_datetime, constants.D1) == constants.D1: # daily
         upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
@@ -128,7 +127,6 @@ def fx_tf_query_manager(source_table:str) -> None:
         # subtract one month from current date
         upadte_table(source_table, source_table[:-2] + constants.M1, number=1, period=constants.MONTH)
         logging.info("M1 row added")
-
 
 def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     """
