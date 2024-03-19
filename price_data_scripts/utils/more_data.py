@@ -198,6 +198,8 @@ def upadte_table(source_table: str, new_table: str, number:int, period:str ):
     
     if show_error:
         logging.warning(f"required data length for {period} is not complete: {len(df_result)} {source_table}")
+    else:
+        logging.info(f"everything complete for {period}: table {source_table}")
 
     if len(df_result) == 0:
         logging.error("no data found on database. for {}".format(new_table))
