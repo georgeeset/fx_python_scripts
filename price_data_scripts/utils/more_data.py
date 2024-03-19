@@ -6,6 +6,8 @@ and m1 data to be store d in separate table
 import calendar
 import pandas as pd
 import pymysql
+
+from price_data_scripts.utils.trading_time import fx_week_start_end, is_last_daty_of_month
 from . import  constants
 import os
 import logging
@@ -19,7 +21,7 @@ def monthdelta(date, delta):
     d = d = min(date.day, calendar.monthrange(y, m)[1])
     return date.replace(day=d,month=m, year=y)
 
-def measured_time(now_datetime:datetime, expected:str) -> str | None:
+def fx_measure_time(now_datetime:datetime, expected:str) -> str | None:
     """
         checks the given time if it is right for next candle stick to start
         args:
@@ -27,15 +29,34 @@ def measured_time(now_datetime:datetime, expected:str) -> str | None:
             expected: expected result to to avoid returning only first correct value
         return: String expected or none
     """
+    # Allow h4 operations at last hour of trading week (fri, 8pm)
+    if (expected == constants.H4 and (now_datetime.hour % 4 == 0)) or (expected == constants.H4 and fx_week_start_end(now_datetime) == 0): # 4 hourly
+        # dont allow h4 operation at first hour of trading week (Mon, 12am)
+        if fx_week_start_end(now_datetime) != 1:
+            return expected
+    
+    # Allow D1 operations at last hour of trading week (fri, 8pm)
+    if (expected == constants.D1 and (now_datetime.hour == 0)) or (expected == constants.D1 and fx_week_start_end(now_datetime) == 0): # daily
+        if fx_week_start_end(now_datetime) != 1:
+            return expected
 
-    if expected == constants.H4 and (now_datetime.hour % 4 == 0): # 4 hourly
+     # Allow W1 operations at last hour of trading week (fri, 8pm)
+    if expected == constants.W1 and fx_week_start_end == 0: # weekly
+        # a week in forex is 5 days (monday to friday)
         return expected
-    if expected == constants.D1 and (now_datetime.hour == 0): # daily
-        return expected
-    if expected == constants.W1 and (now_datetime.weekday == 0): # weekly
-        return expected
+
+    # allow M1 if it is first day of new month and time is midnight
     if expected == constants.M1 and (now_datetime.day == 1) and (now_datetime.hour == 0): # monthly
         return expected
+
+    # allow M1 if friday is last day of the month
+    if expected == constants.M1 and is_last_daty_of_month(now_datetime) and fx_week_start_end(now_datetime) == 0:
+        return expected
+    
+    # allow M1 if Monday is the first week day of the month
+    if expected == constants.M1 and (now_datetime.day <= 2) and (now_datetime.weekday == 0):
+        return expected
+
     return None
 
 def tf_query_manager(source_table:str):
