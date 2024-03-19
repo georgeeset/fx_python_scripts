@@ -35,7 +35,7 @@ async def crypto_data_service():
         else:
             try:
                 # candles_data = data_handler(response)
-                mysql_operations.store_data(candles_data.iloc[-2:], current_pair)
+                mysql_operations.store_data(candles_data.iloc[-4:], current_pair)
             except Exception as e:
                 logging.error("Data storage operation faild: ", e)
 

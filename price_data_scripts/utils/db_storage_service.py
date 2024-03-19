@@ -23,14 +23,6 @@ class MysqlOperations:
         )
 
         self.cursor = self.connection.cursor()
-        
-    def is_connected(self) -> bool:
-        """
-        Confirm status of connection
-        """
-        if self.connection:
-            return True
-        return False
     
     def disconnect(self):
         """
@@ -98,11 +90,10 @@ class MysqlOperations:
             data: dataframe of price of the currency pair trim before sending
                 all data in dataframe will be stored in db
             pair: currency pair or instrument eg EURUSD_h1
+
         returns: None
         """
-        if not self.is_connected:
-            raise ValueError("db is not connected")
-        
+
         self.__create_price_table(pair)
 
        
@@ -151,8 +142,6 @@ class MysqlOperations:
         store key support/ resistance levels 
         """
         sr_table = table_name+'_sr'
-        if not self.is_connected:
-            raise ValueError("Database not connected")
         
         self.__create_sr_table(table_name=sr_table)
 

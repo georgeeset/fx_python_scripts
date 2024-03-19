@@ -60,7 +60,7 @@ async def connect_attempt() -> None:
                 # candles_data = make_dataframe(candles)
                 current_pair = f'{value[constants.TABLE]}_h1'
 
-                my_sql_operations.store_data(data=candles.iloc[-2:],
+                my_sql_operations.store_data(data=candles.iloc[-4:],
                             pair=current_pair
                             )
 
