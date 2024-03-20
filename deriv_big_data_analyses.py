@@ -16,7 +16,7 @@ from price_data_scripts.data_source.deriv import DerivManager
 from price_data_scripts.utils.pattern_detector import PatternDetector
 
 
-async def request_big_data() -> pd.DataFrame:
+async def request_big_data()->None:
     """
     Get data from cloud to database.
     2 years daily data or 1 month daily data

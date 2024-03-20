@@ -257,7 +257,7 @@ class MysqlOperations:
         df_result.set_index(constants.DATETIME, inplace=True)
         return df_result[::-1] # reverse the dataframe to stand upright
 
-    def delete_old_data(self, table_name: pd.DataFrame, years:int):
+    def delete_old_data(self, table_name:str , years:int):
         """
         delete old data from datatable.
         deletes data older than the given datetime
@@ -321,6 +321,3 @@ class MysqlOperations:
             self.connection.commit()
         except Exception as e:
             raise ValueError(f'Failed to increment count: {table} : {col_name} => {e}')
-        
-
-
