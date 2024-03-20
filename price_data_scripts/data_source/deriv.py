@@ -77,7 +77,7 @@ class DerivManager:
             # Convert raw data to a DataFrame
             candles_data = self._make_dataframe(data)
             candles_data.drop(candles_data.index[-1], axis=0, inplace=True)
-            print(candles_data)
+            # print(candles_data)
             return candles_data
 
         return pd.DataFrame()
