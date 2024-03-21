@@ -25,6 +25,7 @@ class AlertComposer:
             msg = constants.PATTERN_ALERT_MESSAGE.format(
                 patterns = pattern_list,
                 c_pair = pair,
+                tf = timeframe,
                 recent_status = pattern[constants.RECENT_STATUS],
                 last_used = pattern[constants.LASTUSED],
                 alert_count = receiver[constants.ALERT_COUNT] + 1,

@@ -187,13 +187,15 @@ TRADE WISELY !!!
 """
 
 PATTERN_ALERT_MESSAGE = """Hi,
-Your Pattern Alert have been traggered,
+Your Pattern Alert have been triggered,
 Kindly check your chart to analyze the market.
 details:
 
 Candlestick pattern(s): {patterns}
 
 Instrument: {c_pair}
+
+Timeframe: {tf}
 
 Served as support/resistance {used} times
 
