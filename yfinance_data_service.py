@@ -16,19 +16,30 @@ from price_data_scripts.utils.trading_time import fx_is_open
 
 async def get_yf_data() -> None:
 
-    
     query_async_tasks = []
     now = datetime.now()
     my_sql_operations = MysqlOperations()
 
     for item in constants.YF_TICKERS:
+        
         data = fetch_yf(item, period='1d', interval='60m' )
 
         # print(len(price_data))
         if data.empty:
             logging.error(f"faild to download data for {item} - 60m")
-            continue
 
+            # continue if it is not time to check other timeframes like h4, D1, W1...
+            # will be updated in subsequent data download routines
+            if fx_measure_time(now, constants.H4) != constants.H4:
+                continue
+
+            logging.info("Retrying....")
+            retries:int = 0
+            while data.empty and retries < 2: 
+                data = fetch_yf(item, period='1d', interval='60m' )
+                retries += 1
+                logging.info(f"retry --- {retries}")
+ 
         current_pair = f'{item[:-2]}_h1'
 
         my_sql_operations.store_data(data, pair=current_pair)
