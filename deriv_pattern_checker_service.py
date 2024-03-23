@@ -56,7 +56,7 @@ async def check_pattern(timeframe:str='h1'):
             logging.error(f"Message sending railed {tbl_name}:", e)
 
     pattern_detector.clean()
-    logging.info(f"pattern check complte for {timeframe}")
+    logging.info(f"pattern check complete for {timeframe}")
 
 async def time_base_checker():
     now_datetime = datetime.now()

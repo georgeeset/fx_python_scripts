@@ -116,8 +116,11 @@ def fx_tf_query_manager(source_table:str) -> None:
         logging.info("H4 row added")
 
     if fx_measure_time(now_datetime, constants.D1) == constants.D1: # daily
-        upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
-        logging.info("D1 row added")
+        if now_datetime.day == 4: # friday doesn't have 24hrs
+            upadte_table(source_table, source_table[:-2] + constants.D1, number=21, period=constants.HOUR)
+        else:
+            upadte_table(source_table, source_table[:-2] + constants.D1, number=1, period=constants.DAY)
+            logging.info("D1 row added")
 
     if fx_measure_time(now_datetime, constants.W1) == constants.W1: # weekly forex = 5 days
         upadte_table(source_table, source_table[:-2] + constants.W1, number=5, period=constants.DAY)
