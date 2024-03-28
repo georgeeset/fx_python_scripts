@@ -16,7 +16,7 @@ from price_data_scripts.data_source.alpha_vantage import AlphaVantage
 from price_data_scripts.utils.pattern_detector import PatternDetector
 from price_data_scripts.utils.trading_time import fx_is_open
 
-def request_big_data() -> pd.DataFrame:
+def request_big_data() -> None:
     """
     Get data from cloud to database.
     2 years daily data or 1 month daily data
@@ -68,7 +68,7 @@ def request_big_data() -> pd.DataFrame:
         if not sr_df.empty:
             my_db.store_sr(sr_df, pair)   # add data received to database
         else:
-            logging.error(f"No support/Resistance found: {pair}")
+            logging.warning(f"No support/Resistance found: {pair}")
             print(f"nothing found on support/resistance: {pair}")
 
         # #TODO move the below block to daily activity as it is needed there
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         exit()
 
     logging.basicConfig(
-    level = logging.INFO,
+    level = logging.WARNING,
     filemode = 'a',
     filename = os.path.join(script_dir, 'logs/big_YF_data.log'),
     format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    

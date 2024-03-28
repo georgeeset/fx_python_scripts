@@ -95,7 +95,7 @@ if __name__ == "__main__":
         exit()
 
     logging.basicConfig(
-    level = logging.INFO,
+    level = logging.WARNING,
     filemode = 'a',
     filename = os.path.join(script_dir, 'logs/pattern_yf.log'),
     format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    

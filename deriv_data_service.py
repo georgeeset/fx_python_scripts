@@ -122,7 +122,7 @@ if __name__  == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     logging.basicConfig(
-    level = logging.INFO,
+    level = logging.WARNING,
     filemode = 'a',
     filename = os.path.join(script_dir, 'logs/deriv_log.log'),
     format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    

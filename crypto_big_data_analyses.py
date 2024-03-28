@@ -15,7 +15,7 @@ from price_data_scripts.data_source.binance import BinanceData
 from price_data_scripts.utils.pattern_detector import PatternDetector
 
 
-def request_big_data(argv) -> pd.DataFrame:
+def request_big_data(argv) -> None:
     """
     Get data from cloud to database.
     2 years daily data or 1 month daily data
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     logging.basicConfig(
-    level = logging.INFO,
+    level = logging.WARNING,
     filemode = 'a',
     filename = os.path.join(script_dir, 'logs/big_crypto.log'),
     format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    
