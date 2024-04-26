@@ -35,6 +35,18 @@ DERIV_TICKERS = [
     {'id': 'JD100', 'table':'Jump_100_Index'},
 ]
 
+STRATEGY_TICKERS = [
+    {'id':'frxAUDUSD', 'table': 'AUDUSD'},
+    {'id':'frxEURGBP', 'table': 'EURGBP'},
+    {'id':'frxEURJPY', 'table': 'EURJPY'},
+    {'id':'frxEURUSD', 'table': 'EURUSD'},
+    {'id':'frxGBPUSD', 'table': 'GBPUSD'},
+    {'id':'frxUSDCAD', 'table': 'USDCAD'},
+    {'id':'frxUSDCHF', 'table': 'USDCHF'},
+    {'id':'frxUSDJPY', 'table': 'USDJPY'},
+    {'id':'frxXAUUSD', 'table': 'GoldUSD'}
+]
+
 """ forex ticker list for yf query
 """
 YF_TICKERS =   [  

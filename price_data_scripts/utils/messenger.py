@@ -78,7 +78,7 @@ class Messenger:
             )
 
 
-    def send_telegram_message(self, message:str, chat_id) -> bool:
+    def send_telegram_message(self, message:str, chat_id:int) -> bool:
         """
         send telegram message to target device. all details provided
         """
