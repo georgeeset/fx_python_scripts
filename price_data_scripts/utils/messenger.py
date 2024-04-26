@@ -46,8 +46,8 @@ class Messenger:
     async def send_email_async(self, email_receiver: str, subject: str, body:str, **params :str):
         """send an outgoing email"""
         # Default parameters
-        cc = params.get('gcc', [])
-        bcc = params.get('bcc', [])
+        cc:str = params.get('gcc', [])
+        bcc:str = params.get('bcc', [])
 
         # define email info
         message = MIMEMultipart("alternative")

@@ -1,3 +1,4 @@
+import logging
 from price_data_scripts.trade_strategy_1.super_trend import super_trend
 from price_data_scripts.trade_strategy_1.vix_fix import wvf
 from price_data_scripts.trade_strategy_1.derivative_oscilator import derivative_oscillator
@@ -7,11 +8,15 @@ from price_data_scripts.utils.messenger import Messenger
 from datetime import datetime
 import pandas as pd
 import asyncio
+import os
 
 
 async def strategy_task(data_source:DerivManager, item:dict, epoch_time:int, messenger:Messenger):
+    try:
 
-    data:pd.DataFrame = await data_source.fetch_candles(item[constants.ID], 86400, 50, epoch_time)
+        data:pd.DataFrame = await data_source.fetch_candles(item[constants.ID], 86400, 50, epoch_time)
+    except Exception as e:
+        logging.error(f'Price request failed. Symbol:{item[constants.TABLE]}, Message: {e}')
 
     response = super_trend(data.copy())
     # print(response)
@@ -58,6 +63,18 @@ async def main() -> None:
     await data_source.disconnect()
 
 if __name__ == "__main__":
+
+    # Get the script's absolute path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    logging.basicConfig(
+    level = logging.WARNING,
+    filemode = 'a',
+    filename = os.path.join(script_dir, 'logs/strategy1.log'),
+    format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',    
+    datefmt='%Y-%m-%d %H:%M:%S',
+    force = True
+    )
 
     asyncio.run(main())
 
