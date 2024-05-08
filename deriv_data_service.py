@@ -27,8 +27,11 @@ async def connect_attempt() -> None:
     now = datetime.now()
     epoch_time = int(now.timestamp())
     # print(epoch_time)
-
-    my_sql_operations = MysqlOperations()
+    try:
+        my_sql_operations = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return
 
     chart_type = "candles"
     granularity = 3600 #seconds = 1 hour
@@ -50,7 +53,7 @@ async def connect_attempt() -> None:
             candles = await deriv_data.fetch_candles(pair = value[constants.ID],
                                                         frame = granularity,
                                                         size = count,
-                                                        end_time =str(epoch_time)
+                                                        end_time = str(epoch_time)
                                                         )
         except Exception as e:
             logging.error(str(e))

@@ -25,7 +25,12 @@ def request_big_data(argv) -> None:
     my_scan_window = constants.SR_SCAN_WINDOW # sr scan window for analyses
     sr_history_limit = constants.SR_HISTORY_LIMIT
 
-    my_db = MysqlOperations()
+    try:
+        my_db = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return # terminate function to avoid other errors
+    
     sr_collector = SRCollector(scan_window=my_scan_window)
     data_source = BinanceData()
 

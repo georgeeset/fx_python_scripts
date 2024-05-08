@@ -21,7 +21,11 @@ async def crypto_data_service():
     binance_data = BinanceData()
     query_async_tasks = []
     now = datetime.now()
-    mysql_operations = MysqlOperations()
+    try:
+        mysql_operations = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return #return as database operation has failed
 
     for ticker in constants.CRYPTO_TICKERS:
         current_pair = f'{ticker}_h1'

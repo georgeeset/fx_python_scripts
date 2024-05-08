@@ -14,13 +14,17 @@ class MysqlOperations:
         """
         connects to mysql database
         """
-        # Connect to the database
-        self.connection = pymysql.connect(
-            host=os.environ.get('STORAGE_MYSQL_HOST'),
-            user=os.environ.get('STORAGE_MYSQL_USER'),
-            password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
-            db=os.environ.get('STORAGE_MYSQL_DB')
-        )
+        try:
+            # Connect to the database
+            self.connection = pymysql.connect(
+                host=os.environ.get('STORAGE_MYSQL_HOST'),
+                user=os.environ.get('STORAGE_MYSQL_USER'),
+                password=os.environ.get('STORAGE_MYSQL_PASSWORD'),
+                db=os.environ.get('STORAGE_MYSQL_DB')
+            )
+        except Exception as e:
+            raise ValueError('Failed to connect mysqldb:', e)
+            
 
         self.cursor = self.connection.cursor()
     

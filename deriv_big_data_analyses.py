@@ -26,7 +26,12 @@ async def request_big_data()->None:
     my_scan_window = constants.SR_SCAN_WINDOW # sr scan window for analyses
     sr_history_limit = constants.SR_HISTORY_LIMIT # years to keep history
 
-    my_db = MysqlOperations()
+    try:
+        my_db = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return
+    
     sr_collector = SRCollector(scan_window=my_scan_window)
     data_source = DerivManager()
     pattern_detector = PatternDetector()
