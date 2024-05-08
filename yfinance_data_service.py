@@ -18,7 +18,12 @@ async def get_yf_data() -> None:
 
     query_async_tasks = []
     now = datetime.now()
-    my_sql_operations = MysqlOperations()
+
+    try:
+        my_sql_operations = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return
 
     for item in constants.YF_TICKERS:
         

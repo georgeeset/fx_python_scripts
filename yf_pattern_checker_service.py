@@ -21,12 +21,18 @@ async def check_pattern(timeframe:str='h1'):
     composer = AlertComposer()
     pattern_detector = PatternDetector()
 
+    try:
+        my_db = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return
+
     logging.info(f'checking pattern for {timeframe}')
 
     for item in constants.VANTAGE_FX_TICKERS:
 
         tbl_name = item+'_'+timeframe
-        my_db = MysqlOperations()
+
         # grab data from db
         data = my_db.get_recent_price(tbl_name, candles)
         # print(data)
@@ -58,6 +64,7 @@ async def check_pattern(timeframe:str='h1'):
 
     pattern_detector.clean()
     logging.info(f"pattern check complte for {timeframe}")
+    my_db.disconnect()
 
 async def time_base_checker():
     now_datetime = datetime.now()

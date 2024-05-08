@@ -20,11 +20,15 @@ async def check_pattern(timeframe:str='h1'):
     composer = AlertComposer()
     pattern_detector = PatternDetector()
     logging.info(f'checking pattern for {timeframe}')
+    try:
+        my_db = MysqlOperations()
+    except Exception as e:
+        logging.error(e)
+        return
 
     for item in constants.CRYPTO_TICKERS:
 
         tbl_name = item+'_'+timeframe
-        my_db = MysqlOperations()
         # grab data from db
         data = my_db.get_recent_price(tbl_name, candles)
 
@@ -55,6 +59,7 @@ async def check_pattern(timeframe:str='h1'):
             logging.error(f"Message sending railed {tbl_name}:", e)
 
     pattern_detector.clean()
+    my_db.disconnect()
     logging.info(f"pattern check complte for {timeframe}")
 
 async def time_base_checker():
