@@ -39,7 +39,12 @@ async def strategy_task(data_source:DerivManager, item:dict, epoch_time:int, mes
         print(message)
     
     if message != '':
-        await messenger.send_telegram_async(message, chat_id=5413877579)
+        try:
+            result = await messenger.send_telegram_async(message, chat_id=5413877579)
+            if result:
+                print("message sent")
+        except Exception as e:
+            logging.error(e)
     else:
         print('no trade')
 
