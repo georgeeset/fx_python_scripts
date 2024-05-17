@@ -46,8 +46,8 @@ class Messenger:
     async def send_email_async(self, email_receiver: str, subject: str, body:str, **params :str):
         """send an outgoing email"""
         # Default parameters
-        cc:str = params.get('gcc', [])
-        bcc:str = params.get('bcc', [])
+        cc:str = params.get('gcc', '')
+        bcc:str = params.get('bcc', '')
 
         # define email info
         message = MIMEMultipart("alternative")
@@ -91,7 +91,7 @@ class Messenger:
         else:
             return False
 
-    async def send_telegram_async(self, message:str, chat_id) ->bool:
+    async def send_telegram_async(self, message:str, chat_id:int) ->bool:
         """
         send telegram message to target device. all details provided
         """

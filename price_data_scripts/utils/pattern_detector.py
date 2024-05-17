@@ -80,7 +80,7 @@ class PatternDetector(MysqlOperations):
         """
         query the pattern alert databaase for user's alert to get their alert info
         """
-        limit = 100 if timeframe == constants.D1 else 1
+        limit = 100 if timeframe == constants.D1 else 10 # Limit increased to 10 from 1
         return self.query_pattern_table(pair, timeframe, limit)
 
     def update_message_count(self, data:pd.DataFrame) -> None:
