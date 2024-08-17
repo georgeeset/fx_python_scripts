@@ -38,7 +38,7 @@ class DerivManager:
         """
         self.api = DerivAPI(app_id = 1234)
 
-    async def fetch_candles(self, pair: str, frame: int, size: int, end_time: str) -> pd.DataFrame:
+    async def fetch_candles(self, pair: str, frame: int, size: int, end_time: int) -> pd.DataFrame:
         """
         Fetches candle data from the Deriv API.
 
@@ -66,7 +66,7 @@ class DerivManager:
                     'style': constants.CANDLES,
                     'granularity': frame,
                     'count': size,
-                    'end': end_time
+                    'end': str(end_time)
                 }
             )
         except Exception as e:

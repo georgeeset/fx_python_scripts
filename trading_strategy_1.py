@@ -39,14 +39,18 @@ async def strategy_task(data_source:DerivManager, item:dict, epoch_time:int, mes
         print(message)
     
     if message != '':
-        m_msger = Messenger()
-        try:
-            # result = messenger.send_telegram_message(message, chat_id=5413877579)
-            result = m_msger.send_telegram_message(message, chat_id=5413877579)
-            if result:
-                print("message sent")
-        except Exception as e:
-            logging.error(e)
+        # m_msger = Messenger()
+        # try:
+        #     # result = messenger.send_telegram_message(message, chat_id=5413877579)
+        #     result = m_msger.send_telegram_message(message, chat_id=5413877579)
+        #     if result:
+        #         print("message sent")
+        # except Exception as e:
+        #     logging.error(e)
+        result = await messenger.send_email_async(email_receiver="georgeperfect4u@gmail.com", subject= "Strategy1 Alert", body=message)
+
+        print(result)
+
     else:
         print('no trade')
 
