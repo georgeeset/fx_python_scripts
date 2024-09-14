@@ -6,6 +6,7 @@ from binance import AsyncClient
 from models.symbol_model import Symbol
 from models.price_index_model import PriceIndex
 from models.assets_model import Asset, Account
+from models.loan_details_model import Transaction, RepayDetails
 
 async def main():
     api_key = os.environ.get('BINANCE_API_KEY')
@@ -130,24 +131,53 @@ async def main():
     # For isolated margin trades, add the isIsolated='TRUE' parameter.
     print(trades)
 
-    print("====================Loans=========================")
+    # print("====================Loans=========================")
 
-    try:
-        # Create loan
-        transaction = await client.create_margin_loan(asset='USDT', amount='1.1')
-        # This for the cross-margin account by default. For isolated margin, add
-        # the isIsolated='TRUE' and the symbol=symbol_name parameters.
-        print(transaction)
-    except Exception as e:
-        print(e)
-
-
+    # try:
+    #     # Create loan
+    #     transaction = await client.create_margin_loan(asset='USDT', amount='1.1')
+    #     # This for the cross-margin account by default. For isolated margin, add
+    #     # the isIsolated='TRUE' and the symbol=symbol_name parameters.
+    #     print(transaction) #{'tranId': 191733908051, 'clientTag': ''}
+    # except Exception as e:
+    #     print(e)
 
 
     # Get cross-margin account info
     info = await client.get_margin_account()
     account = Account.from_dict(info)
     print(account.totalAssetOfBtc)
+
+    try:
+        print("=====================Get Loan Details-ALL or ONE=================")
+        details = await client.get_margin_loan_details() # (asset='BTC', ttxId='100001')
+        # For isolated margin records, add the isolatedSymbol=symbol_name parameter.
+        transactionList = [Transaction.from_dict(trx) for trx in details['rows']]
+        print([transaction.txId for transaction in transactionList])
+    except Exception as e:
+        print(e)
+
+    try:
+        print("====================Get repay details===================")
+        # Get repay details
+        details = await client.get_margin_repay_details() # (asset='USDT', amount='1.1' )
+        # For isolated margin records, add the isolatedSymbol=symbol_name parameter.
+        repay_details = [RepayDetails.from_dict(detail) for detail in details['rows']]
+        print([f"total repay => {float(repay.amount) + float(repay.interest)} {type(repay.amount)}" for repay in repay_details])
+    except Exception as e:
+        print(e)
+
+
+    # print("=============Repay Loan =====================")
+    # try:
+    #     # Repay loan
+    #     transaction = await client.repay_margin_loan(asset='USDT', amount=1.10000693)
+    #     print(transaction) # {'tranId': 191737724149, 'clientTag': ''}
+    # except Exception as e:
+    #     print(e)
+
+
+
 
 
 
