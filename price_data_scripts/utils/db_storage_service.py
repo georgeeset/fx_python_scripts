@@ -24,7 +24,6 @@ class MysqlOperations:
             )
         except Exception as e:
             raise ValueError('Failed to connect mysqldb:', e)
-            
 
         self.cursor = self.connection.cursor()
     
@@ -34,7 +33,7 @@ class MysqlOperations:
         """
         self.cursor.close()
         self.connection.close()
-    
+
     def table_exists(self, table_name) -> bool:
         """
         check if a table exists in the database]
@@ -185,23 +184,23 @@ class MysqlOperations:
         lower_limit = price - tollerance
 
         #TODO consider using ATR so that price volatility will be included
-         
+
         sr_query = f"""SELECT {constants.DATETIME}, {constants.ISSUPPORT}
                     FROM {table_name}
                     WHERE {constants.LEVEL} BETWEEN {lower_limit} AND {upper_limit}
                     ORDER BY {constants.DATETIME} ASC;"""
-        
+
         try:
             self.cursor.execute(sr_query)
             table = self.cursor.fetchall()
         except pymysql.DatabaseError as err :
             print(type(err))
             raise ValueError(f'error loading file => {table_name}: {err}')
-        
+
         if len(table) < 1:
             return pd.DataFrame()
         # print(table)
-    
+
         df_result = pd.DataFrame(table, columns=[
             constants.DATETIME,
             constants.ISSUPPORT

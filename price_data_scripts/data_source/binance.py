@@ -10,8 +10,6 @@ from datetime import datetime
 class BinanceData:
     """
     Manage bianance api connection and download spot price data
-
-    
     """
 
     def __init__(self) -> None:
