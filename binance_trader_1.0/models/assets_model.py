@@ -6,7 +6,7 @@ from typing import List
 
 class Asset:
     """
-    Margin trading asset
+    Cross Margin trading asset
     """
     def __init__(self, asset:str, free:float, locked:float, borrowed:float, interest:float, netAsset:float):
 

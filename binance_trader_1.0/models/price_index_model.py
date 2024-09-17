@@ -1,6 +1,6 @@
-from  .base import Base
+from  .base import BaseModel
 
-class PriceIndex(Base):
+class PriceIndex(BaseModel):
     """
     Price model.
 
@@ -11,8 +11,6 @@ class PriceIndex(Base):
     """
 
     def __init__(self, symbol:str, price:float, calcTime:int):
-
-        super().__init__(name="PriceIndex")
 
         self.symbol = symbol
         self.price = price

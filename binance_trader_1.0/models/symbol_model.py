@@ -1,14 +1,11 @@
 from dataclasses import dataclass
-from .base import Base
+from .base import BaseModel
 
 
-@dataclass
-class Symbol(Base):
+class Symbol(BaseModel):
 
-    def __init__(self,symbol:str, base:str, quote:str, isMarginTrade:bool, isBuyAllowed:bool, isSellAllowed:bool, id:int = 0, ):
+    def __init__(self, symbol:str, base:str, quote:str, isMarginTrade:bool, isBuyAllowed:bool, isSellAllowed:bool):
         
-        super().__init__(id, name='Symbol')
-
         self.symbol = symbol
         self.base = base
         self.quote = quote
