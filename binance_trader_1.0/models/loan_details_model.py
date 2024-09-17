@@ -2,7 +2,7 @@ from .base import BaseModel
     
 
 
-class Transaction(BaseModel):
+class Loan(BaseModel):
     """
     handles details about loan
     """

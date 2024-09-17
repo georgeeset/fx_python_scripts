@@ -16,14 +16,6 @@ from models.isolated_account_info_model import Account
 def datetime_to_milliseconds(dt: datetime) -> int:
     return int(dt.replace(tzinfo=timezone.utc).timestamp() * 1000)
 
-async def transfer_sport_to_isolated_margin(currency:str, margin_symbol:str, client):
-    print("=======Transfer sport to Isolated Margin=======")
-    try:
-        response = await client.transfer_spot_to_isolated_margin(asset='USDT',  amount=2.0, symbol="XRPUSDT")
-        print(response)
-    except Exception as e:
-        print(e)
-
 async def main():
     api_key = os.environ.get('BINANCE_API_KEY')
     secret_key = os.environ.get('SECRET_KEY')
@@ -87,7 +79,6 @@ async def main():
 
     print("=================Order validation=======================")
     
-
     #==================================================================================
     # Place a margin order
     # Use the create_margin_order function to have full control over creating an order
@@ -225,13 +216,7 @@ async def main():
 
 
     # print("===================Get all Isolated Margin symbol==================")
-    # try:
-    #     # Get all isolated margin symbols
-    #     info = await client.get_all_isolated_margin_symbols()
-    #     symbols = [Symbol.from_dict(inf) for inf in info]
-    #     print ([symbol.symbol for symbol in symbols])
-    # except Exception as e:
-    #     print(e)
+   
 
 
     # # Get cross-margin account info

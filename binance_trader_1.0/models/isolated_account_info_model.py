@@ -33,7 +33,7 @@ class Asset(BaseModel):
 
 
 
-class Account(BaseModel):
+class IsolatedAcct(BaseModel):
     """
     Isolated Margin Account detail
     """

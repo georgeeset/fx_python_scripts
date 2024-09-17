@@ -29,10 +29,11 @@ class Asset:
                    )
 
 
-class Account:
+class CrossAcct:
 
     """
     Account information
+    cross margin
     """
 
     def __init__(self, tradeEnabled:bool, transferEnabled:bool,
@@ -51,7 +52,7 @@ class Account:
         self.userAssets = userAssets if userAssets is not None else []
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data:dict):
         assets = [Asset.from_dict(asset) for asset in data.get('assets', [])]
         return cls(tradeEnabled=data['tradeEnabled'], transferEnabled = data['transferEnabled'], transferInEnabled = data['transferInEnabled'],
                    transferOutEnabled=data['transferOutEnabled'], borrowEnabled=data['borrowEnabled'], totalNetAssetOfBtc = data['totalNetAssetOfBtc'],
