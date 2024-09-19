@@ -14,8 +14,19 @@ async def main():
     my_margin = BinanceMargin(is_isolated=True)
     await my_margin.initialize_client(api_key=api_key, api_secret=secret_key)
 
-    res = await my_margin.open_market_position(symbol='XRPUSDT', side= 'SELL', quantity=10)
+    symbol = 'XRPUSDT'
+
+    # res = await my_margin.open_market_position(symbol='XRPUSDT', side= 'BUY', quantity=10)
+    # print(res)
+
+    res = await my_margin.place_trailing_limit_order('XRPUSDT', 'SELL', stop_price=0.5876, limit_price=0.5827, delta=10, quantity=19)
     print(res)
+
+    # res = await my_margin.place_margin_stop_order(symbol, 'SELL', 0.5811, 0.5800, 19)
+    # print(res, end="\n\n")
+
+    # res = await my_margin.get_all_open_margin_orders(symbol=symbol)
+    # print(res, end='\n\n')
 
     res = await my_margin.margin_account_info()
     print(res)

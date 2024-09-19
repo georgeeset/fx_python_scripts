@@ -24,7 +24,7 @@ class BinanceMargin:
             api_secret=api_secret
     )
 
-    async def get_all_margin_orders(self, symbol:str, limit:int=10) -> dict:
+    async def get_all_open_margin_orders(self, symbol:str, limit:int=10) -> dict:
         """
         get all open cross margin order
 
@@ -34,7 +34,7 @@ class BinanceMargin:
         returns: List of Orders
         """
         try: # Allmargin orders
-            orders = await self.client.get_all_margin_orders(symbol=symbol, limit=limit)
+            orders = await self.client.get_open_margin_orders(symbol=symbol, isIsolated = self.is_isolated, limit=limit)
             return orders
         except Exception as e:
             raise ValueError(f"failed to get all cross margin orders {e}")
@@ -50,9 +50,7 @@ class BinanceMargin:
             info = await self.client.get_margin_symbol(symbol=symbol)
         return Symbol(**info)
 
-    async def place_margin_order(self, symbol:str, side:str, entry_price:float,
-                                 quantity:float, time_in_force:str=TIME_IN_FORCE_GTC,
-                                 order_type:str=ORDER_TYPE_LIMIT):
+    async def place_margin_limit_order(self, symbol:str, side:str, entry_price:float, quantity:float,order_type:str):
         """
          Use the create_margin_order function to have full
          control over creating an order
@@ -62,14 +60,55 @@ class BinanceMargin:
             order = await self.client.create_margin_order(
             symbol= symbol,
             side=side,
-            type=order_type,
-            timeInForce=time_in_force,
+            type=ORDER_TYPE_LIMIT,
+            timeInForce=TIME_IN_FORCE_GTC,
             quantity=quantity,
-            price=entry_price
+            price=entry_price,
+            isIsolated=self.is_isolated
             )
             return order
         except Exception as e:
-            raise ValueError(f"failed to place margin order: {e}")
+            raise ValueError(f"failed to place margin Limit order: {e}")
+
+    async def place_margin_stop_order(self, symbol:str, side:str, limit_price:float, stop_price:float, quantity:float):
+        """
+        Use the create a stop_limit order function to have full
+        control over creating an order
+        """
+        try:
+            order = await self.client.create_margin_order(
+            symbol= symbol,
+            side=side,
+            type=ORDER_TYPE_STOP_LOSS_LIMIT,
+            timeInForce=TIME_IN_FORCE_GTC,
+            quantity=quantity,
+            price=limit_price,
+            stopPrice=stop_price,
+            isIsolated=self.is_isolated
+            )
+            return order
+        except Exception as e:
+            raise ValueError(f"failed to place margin Stop order: {e}")
+
+    async def place_trailing_limit_order(self, symbol:str, side:str, stop_price:float, limit_price, delta:float, quantity:float):
+        """
+        apply tailing order
+        """
+        try:
+            order = await self.client.create_margin_order(
+                symbol = symbol,
+                side = side,
+                stopPrice = stop_price,
+                price = limit_price,
+                type = ORDER_TYPE_TAKE_PROFIT_LIMIT,
+                timeInForce = TIME_IN_FORCE_GTC,
+                trailingDelta = delta, # in percentage
+                quantity = quantity,
+                isIsolated = self.is_isolated,
+            )
+            return order
+        except Exception as e:
+            raise ValueError(f"failed to place trailing order: {e}")
 
     async def check_order_status(self, symbol:str, order_id:int):
         """ 
