@@ -1,38 +1,64 @@
-import asyncio
-from datetime import datetime, timezone
-import os
-from binance_margin import BinanceMargin
+import websocket
+import json
+import time
+import logging
 
+class BinanceWebSocket:
+    def __init__(self, symbols):
+        self.socket_url = "wss://stream.binance.com:9443/ws"
+        self.symbols = symbols
+        self.ws = None
+        self.subscribe_message = json.dumps({
+            "method": "SUBSCRIBE",
+            "params": [f"{symbol.lower()}@trade" for symbol in symbols],
+            "id": 1
+        })
 
-def datetime_to_milliseconds(dt: datetime) -> int:
-    return int(dt.replace(tzinfo=timezone.utc).timestamp() * 1000)
+    def on_message(self, ws, message):
+        data = json.loads(message)
+        if 'p' in data:
+            symbol = data['s']
+            price = data['p']
+            print(f"Symbol: {symbol}, Price: {price}")
 
-async def main():
-    api_key = os.environ.get('BINANCE_API_KEY')
-    secret_key = os.environ.get('SECRET_KEY')
+    def on_error(self, ws, error):
+        logging.error(f"Error: {error}")
 
-    my_margin = BinanceMargin(is_isolated=True)
-    await my_margin.initialize_client(api_key=api_key, api_secret=secret_key)
+    def on_close(self, ws, close_status_code, close_msg):
+        logging.warning("Connection closed. Reconnecting...")
+        time.sleep(5)
+        self.connect()
 
-    symbol = 'XRPUSDT'
+    def on_open(self, ws):
+        logging.info("Connection opened.")
+        ws.send(self.subscribe_message)
 
-    # res = await my_margin.open_market_position(symbol='XRPUSDT', side= 'BUY', quantity=10)
-    # print(res)
+    def connect(self):
+        self.ws = websocket.WebSocketApp(self.socket_url,
+                                         on_message=self.on_message,
+                                         on_error=self.on_error,
+                                         on_close=self.on_close)
+        self.ws.on_open = self.on_open
+        self.ws.run_forever()
 
-    res = await my_margin.place_trailing_limit_order('XRPUSDT', 'SELL', stop_price=0.5876, limit_price=0.5827, delta=10, quantity=19)
-    print(res)
+class TradingBot:
+    def __init__(self, api_key, api_secret):
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.ws = BinanceWebSocket(symbols=["BTCUSDT", "ETHUSDT"])
 
-    # res = await my_margin.place_margin_stop_order(symbol, 'SELL', 0.5811, 0.5800, 19)
-    # print(res, end="\n\n")
+    def start(self):
+        self.ws.connect()
 
-    # res = await my_margin.get_all_open_margin_orders(symbol=symbol)
-    # print(res, end='\n\n')
+    def place_margin_order(self, symbol, side, quantity, price):
+        # Placeholder for placing margin orders
+        pass
 
-    res = await my_margin.margin_account_info()
-    print(res)
-
-    await my_margin.close()
+    def send_telegram_message(self, message):
+        # Placeholder for sending Telegram messages
+        pass
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    logging.basicConfig(level=logging.INFO)
+    bot = TradingBot(api_key='your_api_key', api_secret='your_api_secret')
+    bot.start()

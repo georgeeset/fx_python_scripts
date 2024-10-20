@@ -1,6 +1,3 @@
-import asyncio
-import json
-import os
 from binance import AsyncClient
 from binance.enums import *
 from models.symbol_model import Symbol
@@ -21,7 +18,8 @@ class BinanceMargin:
          """must initialize client """
          self.client = await AsyncClient.create(
             api_key=api_key,
-            api_secret=api_secret
+            api_secret=api_secret,
+            testnet=True
     )
 
     async def get_all_open_margin_orders(self, symbol:str, limit:int=10) -> dict:
@@ -49,6 +47,14 @@ class BinanceMargin:
         else:
             info = await self.client.get_margin_symbol(symbol=symbol)
         return Symbol(**info)
+    
+    async def get_cross_margin_account_info(self, symbol:str):
+        """
+        get margin account information
+        """
+
+        info = await self.client.get_margin_account(symbol = symbol, isIsolated=self.is_isolated)
+        return info
 
     async def place_margin_limit_order(self, symbol:str, side:str, entry_price:float, quantity:float,order_type:str):
         """
@@ -64,7 +70,8 @@ class BinanceMargin:
             timeInForce=TIME_IN_FORCE_GTC,
             quantity=quantity,
             price=entry_price,
-            isIsolated=self.is_isolated
+            isIsolated=self.is_isolated,
+            sideEffectType=AUTO_REPAY_TYPE
             )
             return order
         except Exception as e:
@@ -84,31 +91,12 @@ class BinanceMargin:
             quantity=quantity,
             price=limit_price,
             stopPrice=stop_price,
-            isIsolated=self.is_isolated
+            isIsolated=self.is_isolated,
+            sideEffectType=AUTO_REPAY_TYPE
             )
             return order
         except Exception as e:
             raise ValueError(f"failed to place margin Stop order: {e}")
-
-    async def place_trailing_limit_order(self, symbol:str, side:str, stop_price:float, limit_price, delta:float, quantity:float):
-        """
-        apply tailing order
-        """
-        try:
-            order = await self.client.create_margin_order(
-                symbol = symbol,
-                side = side,
-                stopPrice = stop_price,
-                price = limit_price,
-                type = ORDER_TYPE_TAKE_PROFIT_LIMIT,
-                timeInForce = TIME_IN_FORCE_GTC,
-                trailingDelta = delta, # in percentage
-                quantity = quantity,
-                isIsolated = self.is_isolated,
-            )
-            return order
-        except Exception as e:
-            raise ValueError(f"failed to place trailing order: {e}")
 
     async def check_order_status(self, symbol:str, order_id:int):
         """ 
@@ -133,25 +121,37 @@ class BinanceMargin:
         )
         return result
 
-    async def get_all_open_margin_orders(self, symbol:str):
+    async def create_oco_order(self, symbol:str, side:str, quantity:float, tp:float, sl:float, sl2:float):
         """
-        Get all open margin orders
-        For isolated margin, add the isIsolated='TRUE' parameter.
+        Createe an oco order for sl and tp
 
+        args:
+            side: you SELL if you already bought and you want a sell order
+                you BUY if you already  sold and you want a buy order
         """
-        orders = await self.client.get_open_margin_orders(symbol=symbol, isIsolated=self.is_isolated)
-        return orders
 
-    async def margin_account_info(self)->CrossAcct | IsolatedAcct:
+        try:
+            order = await self.client.create_margin_oco_order(
+                symbol = symbol,
+                side = side,
+                quantity = quantity,
+                price = tp,
+                stopPrice = sl,
+                stopLimitPrice = sl2,
+                stopLimitTimeInForce = 'GTC'
+            )
+        except Exception as e:
+            print(f"Error creating oco {e}")
+
+        return order
+
+    async def symbol_allow_orders(self, symbol):
         """
+        check symbol information and confirm if the symbol supports orders or not
         """
-        info = None
-        if self.is_isolated:
-            info = await self.client.get_isolated_margin_account()
-            return IsolatedAcct.from_dict(info)
-        else:
-            info = await self.client.get_margin_account()
-        return CrossAcct.from_dict(info)
+
+        info = await self.client.get_symbol_info(symbol=symbol)
+        return info
 
     async def transfer_spot_to_margin(self, asset:str, amount:float, symbol=None):
         """
@@ -185,8 +185,7 @@ class BinanceMargin:
         else:
             response = await self.client.transfer_margin_to_spot(asset=symbol, amount=amount)
             return response
-        return 
-    
+
     async def open_market_position(self, symbol:str, side:str, quantity:float):
         """
         Open position
@@ -205,7 +204,7 @@ class BinanceMargin:
         except Exception as e:
             print(e)
 
-    async def get_all_margin_trades(self, symbol:str|None):
+    async def get_all_margin_trades(self, symbol:str):
         """
         Get all margin trades
         For isolated margin trades, add the isIsolated='TRUE' parameter.
@@ -260,3 +259,9 @@ class BinanceMargin:
         close connection
         """
         await self.client.close_connection()
+
+    def helper(self):
+        """
+        view help for you functions here
+        """
+        help(self.client.create_margin)
